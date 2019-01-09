@@ -1,5 +1,6 @@
 const cav=document.querySelector('#cav');
 const box=cav.getContext('2d');
+const scoreRowText="SCORE:";
 function draw(point,color){
     // point 取值0-624
     //  每行有25个格子
@@ -89,6 +90,7 @@ let score=0;
 (()=>{
     food.foodExist=false;
     let pop;
+    document.querySelector('#score').innerText=scoreRowText+String(score);
     let t=setInterval(()=>{
         if(!food.foodExist){
             food.createFood();
@@ -97,13 +99,14 @@ let score=0;
         if(snake.getFood(food.position)){
             score++;
             food.foodExist=false;
+            document.querySelector('#score').innerText=scoreRowText+String(score);
         };
         
         if(snake.crash()){
             clearInterval(t);
-            alert('YOU FALLED!');
+            alert('你输了!\n刷新网页以重新开始');
         }
-        
+
         snake.body.map((value,index)=>{
             draw(value,'#00ff00');//emm，好神奇啊为什么要+1才可以，以后再想叭
         });

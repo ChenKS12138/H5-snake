@@ -5,8 +5,13 @@
 body{
     background-color: #aaaaaa;
     text-align: center;
-    padding: 50px;
+    padding: 20px;
 }
 #cav{
     background-color: gray;
+}
+#score{
+    font-size: 2rem;
+    color: white;
+    font-weight: bold;
 }

@@ -1,17 +1,24 @@
 const cav=document.querySelector('#cav');
 const box=cav.getContext('2d');
 const scoreRowText="SCORE:";
+const backGroundColor="Snow";
+const snackColor="#008B00";
+const canvasBackGroundColor="snow";
+const foodColor="#FFD700";
+
+
 function draw(point,color){
     // point 取值0-624
     //  每行有25个格子
     // 0-24 为第一行,以此类推
     box.fillStyle=color;
-    box.fillRect((point%25)*20,(~~(point/25))*20,18,18);
+    box.fillRect((point%25)*20+1,(~~(point/25))*20+1,18,18);
 }
 
 (function ready(){
+    cav.style.backgroundColor=canvasBackGroundColor;
     for(let i=0;i<625;i++){
-        draw(i,'#313131');
+        draw(i,backGroundColor);
     }
 })();
 
@@ -73,7 +80,7 @@ function Food(){
     function createFood(){
         foodExist=this.foodExist;
         this.position=(~~(Math.random()*1000)%623);
-        draw(this.position,'yellow');
+        draw(this.position,foodColor);
     }
     return{
         foodExist:foodExist,
@@ -101,38 +108,48 @@ let score=0;
             food.foodExist=false;
             document.querySelector('#score').innerText=scoreRowText+String(score);
         };
+        snake.body.forEach((value,index)=>{
+            draw(value,snackColor);
+        });
         
+
+        pop=snake.move();
+
+        snake.body.map((value,index)=>{
+            draw(value,snackColor);
+        });
+        draw(pop,backGroundColor);
+
         if(snake.crash()){
             clearInterval(t);
             alert('你输了!\n刷新网页以重新开始');
         }
-
-        snake.body.map((value,index)=>{
-            draw(value,'#00ff00');//emm，好神奇啊为什么要+1才可以，以后再想叭
-        });
-
-        
-        draw(pop,'#313131');
-
-        pop=snake.move();
     },200);
     document.addEventListener('keydown',(e) => {
         switch(e.keyCode){
             case 38:
             case 87:
-                snake.direction=-25;
+                if(snake.direction!==25){
+                    snake.direction=-25;
+                };
                 break;
             case 40:
             case 83:
-                snake.direction=25;
+                if(snake.direction!==-25){
+                    snake.direction=25;
+                }
                 break;
             case 37:
             case 65:
-                snake.direction=-1;
+                if(snake.direction!==1){
+                    snake.direction=-1;
+                }
                 break;
             case 39:
             case 68: 
-                snake.direction=1;
+                if(snake.direction!==-1){
+                    snake.direction=1;
+                }
                 break;
         }
     })

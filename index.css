@@ -3,12 +3,10 @@
     margin: 0;
 }
 body{
-    background-color: #aaaaaa;
+    /* background-color: #aaaaaa; */
+    background-color: NavajoWhite;
     text-align: center;
     padding: 20px;
-}
-#cav{
-    background-color: gray;
 }
 #score{
     font-size: 2rem;

@@ -99,6 +99,10 @@ let score=0;
     let pop;
     document.querySelector('#score').innerText=scoreRowText+String(score);
     let t=setInterval(()=>{
+        if(snake.crash()){
+            clearInterval(t);
+            alert('你输了!\n刷新网页以重新开始');
+        }
         if(!food.foodExist){
             food.createFood();
             food.foodExist=true;
@@ -119,11 +123,6 @@ let score=0;
             draw(value,snackColor);
         });
         draw(pop,backGroundColor);
-
-        if(snake.crash()){
-            clearInterval(t);
-            alert('你输了!\n刷新网页以重新开始');
-        }
     },200);
     document.addEventListener('keydown',(e) => {
         switch(e.keyCode){

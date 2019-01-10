@@ -94,11 +94,11 @@ let snake=new Snake();
 let food=new Food();
 let score=0;
 
-(()=>{
+(function(){
     food.foodExist=false;
     let pop;
     document.querySelector('#score').innerText=scoreRowText+String(score);
-    let t=setInterval(()=>{
+    let t=setInterval(function(){
         
         if(!food.foodExist){
             food.createFood();
@@ -119,12 +119,12 @@ let score=0;
         }
         pop=snake.move();
 
-        snake.body.map((value,index)=>{
+        snake.body.map(function(value,index){
             draw(value,snackColor);
         });
         draw(pop,backGroundColor);
     },200);
-    document.addEventListener('keydown',(e) => {
+    document.addEventListener('keydown',function(e){
         switch(e.keyCode){
             case 38:
             case 87:

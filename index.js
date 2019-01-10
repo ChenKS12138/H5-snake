@@ -43,7 +43,7 @@ function Snake() {
         let body=this.body;
         let point=body[0];
         let direction=this.direction;
-        if((direction===-25&&point>-1&&point<25)||(direction===25&&point>599&&point<625)||(direction===-1&&(point+1)%25===0)||(direction===1&&point%25===0)){
+        if((direction===-25&&point>-1&&point<25)||(direction===25&&point>599&&point<625)||(direction===-1&&(point)%25===0)||(direction===1&&(point+1)%25===0)){
             return 2;
         }
         if(body.lastIndexOf(point)!==0){
@@ -99,10 +99,7 @@ let score=0;
     let pop;
     document.querySelector('#score').innerText=scoreRowText+String(score);
     let t=setInterval(()=>{
-        if(snake.crash()){
-            clearInterval(t);
-            alert('你输了!\n刷新网页以重新开始');
-        }
+        
         if(!food.foodExist){
             food.createFood();
             food.foodExist=true;
@@ -112,11 +109,14 @@ let score=0;
             food.foodExist=false;
             document.querySelector('#score').innerText=scoreRowText+String(score);
         };
-        snake.body.forEach((value,index)=>{
-            draw(value,snackColor);
-        });
         
 
+        
+
+        if(snake.crash()){
+            clearInterval(t);
+            alert('你输了!\n刷新网页以重新开始');
+        }
         pop=snake.move();
 
         snake.body.map((value,index)=>{

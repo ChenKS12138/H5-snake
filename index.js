@@ -15,6 +15,14 @@ let size=400;//canvas的宽度和长度
 let cellNum=20;//canvas 中一行的格子数
 let edgeSize=1;//格子间的缝的大小
 
+(function (){
+    let width=window.screen.width;
+    if(width<1000){
+        size=300;
+        cellNum=20;
+    }
+})()
+
 const start=true;
 
 cav.width=size;

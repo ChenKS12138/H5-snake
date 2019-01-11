@@ -23,7 +23,7 @@ let edgeSize=1;//格子间的缝的大小
     }
 })()
 
-const start=true;
+const work=true;
 
 cav.width=size;
 cav.height=size;
@@ -149,9 +149,8 @@ let score=0;
     food.foodExist=false;
     let pop;
     document.querySelector('#score').innerText=scoreRowText+String(score);
-    if(start){
+    if(work){
         let t=setInterval(function(){
-        
             if(!food.foodExist){
                 food.createFood(snake.body);
                 food.foodExist=true;
@@ -161,16 +160,11 @@ let score=0;
                 food.foodExist=false;
                 document.querySelector('#score').innerText=scoreRowText+String(score);
             };
-            
-    
-            
-    
             if(snake.crash()){
                 clearInterval(t);
                 alert('你输了!\n刷新网页以重新开始');
             }
             pop=snake.move();
-    
             snake.body.map(function(value,index){
                 draw(value,snackColor);
             });
@@ -182,18 +176,23 @@ let score=0;
             case 38:
             case 87:
                 snake.changeDirection('up');
+                e.returnValue=false;
                 break;
             case 40:
             case 83:
                 snake.changeDirection('down');
+                e.returnValue=false;
                 break;
             case 37:
             case 65:
                 snake.changeDirection('left');
+                e.returnValue=false;
                 break;
             case 39:
             case 68: 
                 snake.changeDirection('right');
+                e.returnValue=false;
+                break;
         }
     });
     up.addEventListener('click',function(){

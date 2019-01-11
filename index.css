@@ -34,6 +34,9 @@ body{
     border: 0.5px whitesmoke solid;
     cursor: pointer;
 }
+.direction>div>div:active{
+    background-color: #FFB90F
+}
 .button-name{
     transform: rotate(-45deg);
 }

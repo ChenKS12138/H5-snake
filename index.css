@@ -3,13 +3,48 @@
     margin: 0;
 }
 body{
-    /* background-color: #aaaaaa; */
     background-color: NavajoWhite;
     text-align: center;
     padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    user-select: none;
 }
-#score{
-    font-size: 2rem;
+#cav{
+    margin: 0rem 3rem 0rem 3rem;
+    margin-top: 0;
+}
+.direction{
+    margin-top: 1rem;
+    transform: rotate(45deg);
+}
+.direction>div{
+    display: flex;
+}
+.direction>div>div{
+    width: 80px;
+    height: 80px;
+    background-color: gold;
     color: white;
-    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 0.5px whitesmoke solid;
+    cursor: pointer;
+}
+.button-name{
+    transform: rotate(-45deg);
+}
+#up{
+    border-radius: 100% 0 0 0;
+}
+#right{
+    border-radius: 0 100% 0 0;
+}
+#down{
+    border-radius: 0 0 100% 0;
+}
+#left{
+    border-radius: 0 0 0 100%;
 }

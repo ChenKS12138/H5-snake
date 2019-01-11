@@ -1,29 +1,42 @@
 const cav=document.querySelector('#cav');
+const up=document.querySelector('#up');
+const right=document.querySelector('#right');
+const down=document.querySelector('#down');
+const left=document.querySelector('#left');
 const box=cav.getContext('2d');
 const scoreRowText="SCORE:";
 const backGroundColor="Snow";
 const snackColor="#008B00";
 const canvasBackGroundColor="snow";
 const foodColor="#FFD700";
+const speed=200;
 
+let size=400;//canvas的宽度和长度
+let cellNum=20;//canvas 中一行的格子数
+let edgeSize=1;//格子间的缝的大小
+
+const start=true;
+
+cav.width=size;
+cav.height=size;
 
 function draw(point,color){
     // point 取值0-624
     //  每行有25个格子
     // 0-24 为第一行,以此类推
     box.fillStyle=color;
-    box.fillRect((point%25)*20+1,(~~(point/25))*20+1,18,18);
+    box.fillRect((point%cellNum)*(size/cellNum)+1,(~~(point/cellNum))*(size/cellNum)+edgeSize,(size/cellNum)-2*edgeSize,(size/cellNum)-2*edgeSize);
 }
 
 (function ready(){
     cav.style.backgroundColor=canvasBackGroundColor;
-    for(let i=0;i<625;i++){
+    for(let i=0;i<Math.pow(cellNum,2);i++){
         draw(i,backGroundColor);
     }
 })();
 
 function Snake() {
-    let body= new Array(37,36,35,);//第一个元素为蛇的头
+    let body= new Array(23,22,21);//第一个元素为蛇的头
     //point 表示蛇的头
     let direction=1;// 1为向右，-1为向左，25为向下，-25为向上
     let pop;
@@ -43,7 +56,7 @@ function Snake() {
         let body=this.body;
         let point=body[0];
         let direction=this.direction;
-        if((direction===-25&&point>-1&&point<25)||(direction===25&&point>599&&point<625)||(direction===-1&&(point)%25===0)||(direction===1&&(point+1)%25===0)){
+        if((direction===-cellNum&&point>-1&&point<cellNum)||(direction===cellNum&&point>(cellNum*cellNum-cellNum-1)&&point<(cellNum*cellNum))||(direction===-1&&(point)%cellNum===0)||(direction===1&&(point+1)%cellNum===0)){
             return 2;
         }
         if(body.lastIndexOf(point)!==0){
@@ -65,6 +78,30 @@ function Snake() {
             return 0;
         }
     }
+    function changeDirection(dir){
+        switch(dir){
+            case 'up': 
+                if(this.direction!==cellNum){
+                    this.direction=-cellNum;
+                };
+                break;
+            case 'down':
+                if(this.direction!==-cellNum){
+                    this.direction=cellNum;
+                }
+                break;
+            case 'left':
+                if(this.direction!==1){
+                    this.direction=-1;
+                }
+                break;
+            case 'right':
+                if(this.direction!==-1){
+                    this.direction=1;
+                }
+                break;
+        }
+    }
 
     return {
         body:body,
@@ -72,20 +109,26 @@ function Snake() {
         move:move,
         crash:crash,
         getFood:getFood,
+        changeDirection:changeDirection,
     }
 }
 function Food(){
     let foodExist;
     let position;
-    function createFood(){
+    function createFood(snakeBody){
         foodExist=this.foodExist;
-        this.position=(~~(Math.random()*1000)%623);
+        let randPosition=(~~(Math.random()*1000)%(cellNum*cellNum-2));
+        while(snakeBody.indexOf(randPosition)!==-1){
+            randPosition=(~~(Math.random()*1000)%(cellNum*cellNum-2));
+        }
+        // this.position=(~~(Math.random()*1000)%(cellNum*cellNum-2));
+        this.position=randPosition;
         draw(this.position,foodColor);
     }
     return{
         foodExist:foodExist,
         createFood:createFood,
-        position:position
+        position:position,
     }
 }
 
@@ -98,58 +141,63 @@ let score=0;
     food.foodExist=false;
     let pop;
     document.querySelector('#score').innerText=scoreRowText+String(score);
-    let t=setInterval(function(){
+    if(start){
+        let t=setInterval(function(){
         
-        if(!food.foodExist){
-            food.createFood();
-            food.foodExist=true;
-        }
-        if(snake.getFood(food.position)){
-            score++;
-            food.foodExist=false;
-            document.querySelector('#score').innerText=scoreRowText+String(score);
-        };
-        
-
-        
-
-        if(snake.crash()){
-            clearInterval(t);
-            alert('你输了!\n刷新网页以重新开始');
-        }
-        pop=snake.move();
-
-        snake.body.map(function(value,index){
-            draw(value,snackColor);
-        });
-        draw(pop,backGroundColor);
-    },200);
+            if(!food.foodExist){
+                food.createFood(snake.body);
+                food.foodExist=true;
+            }
+            if(snake.getFood(food.position)){
+                score++;
+                food.foodExist=false;
+                document.querySelector('#score').innerText=scoreRowText+String(score);
+            };
+            
+    
+            
+    
+            if(snake.crash()){
+                clearInterval(t);
+                alert('你输了!\n刷新网页以重新开始');
+            }
+            pop=snake.move();
+    
+            snake.body.map(function(value,index){
+                draw(value,snackColor);
+            });
+            draw(pop,backGroundColor);
+        },speed);
+    }
     document.addEventListener('keydown',function(e){
         switch(e.keyCode){
             case 38:
             case 87:
-                if(snake.direction!==25){
-                    snake.direction=-25;
-                };
+                snake.changeDirection('up');
                 break;
             case 40:
             case 83:
-                if(snake.direction!==-25){
-                    snake.direction=25;
-                }
+                snake.changeDirection('down');
                 break;
             case 37:
             case 65:
-                if(snake.direction!==1){
-                    snake.direction=-1;
-                }
+                snake.changeDirection('left');
                 break;
             case 39:
             case 68: 
-                if(snake.direction!==-1){
-                    snake.direction=1;
-                }
-                break;
+                snake.changeDirection('right');
         }
-    })
+    });
+    up.addEventListener('click',function(){
+        snake.changeDirection('up');
+    });
+    right.addEventListener('click',function(){
+        snake.changeDirection('right');
+    });
+    down.addEventListener('click',function(){
+        snake.changeDirection('down');
+    });
+    left.addEventListener('click',function(){
+        snake.changeDirection('left');
+    });
 })();

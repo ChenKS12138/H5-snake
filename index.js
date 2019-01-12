@@ -150,6 +150,11 @@ function Controller(snake,food){
             spText.innerText=spTextContent[~~work];
         }
     }
+    function direction(direc){
+        if(work){
+            snake.changeDirection(direc);
+        }
+    }
     function interval(){
         t=setInterval(function(){
             if(work){
@@ -178,6 +183,7 @@ function Controller(snake,food){
     return{
         interval:interval,
         pause:pause,
+        direction:direction,
     }
 }
 
@@ -203,21 +209,21 @@ let score=0;
         switch(e.keyCode){
             case 38:
             case 87:
-                snake.changeDirection('up');
+                controller.direction('up');
                 e.returnValue=false;
             case 40:
             case 83:
-                snake.changeDirection('down');
+                controller.direction('down');
                 e.returnValue=false;
                 break;
             case 37:
             case 65:
-                snake.changeDirection('left');
+                controller.direction('left');
                 e.returnValue=false;
                 break;
             case 39:
             case 68: 
-                snake.changeDirection('right');
+                controller.direction('right');
                 e.returnValue=false;
                 break;
             case 80:
@@ -226,16 +232,16 @@ let score=0;
     });
     
     up.addEventListener('click',function(){
-        snake.changeDirection('up');
+        controller.direction('up');
     });
     right.addEventListener('click',function(){
-        snake.changeDirection('right');
+        controller.direction('right');
     });
     down.addEventListener('click',function(){
-        snake.changeDirection('down');
+        controller.direction('down');
     });
     left.addEventListener('click',function(){
-        snake.changeDirection('left');
+        controller.direction('left');
     });
 
     spButton.addEventListener('click',function(){

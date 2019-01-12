@@ -16,9 +16,13 @@ body{
     margin: 0rem 3rem 0rem 3rem;
     margin-top: 0;
 }
+.main{
+    display: flex;
+}
 .direction{
     margin-top: 1rem;
     transform: rotate(45deg);
+    
 }
 .direction>div{
     display: flex;
@@ -35,7 +39,7 @@ body{
     cursor: pointer;
 }
 .direction>div>div:active{
-    background-color: #FFB90F
+    background-color: #FFB90F;
 }
 .button-name{
     transform: rotate(-45deg);
@@ -51,4 +55,47 @@ body{
 }
 #left{
     border-radius: 0 0 0 100%;
+}
+.controller{
+    margin-top: 10px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    align-items: center;
+    margin-left: 30px;
+    height: 160px;
+}
+.controller>div{
+    background-color: gold;
+    color: white;
+    border-radius: 10px;
+    width: 100px;
+    height: 50px;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: white 0.5px solid;
+    cursor: pointer;
+}
+.controller>div:active{
+    background-color: #FFB90F;
+}
+.controller>div>p{
+    padding: 0;
+    margin: 0;
+}
+
+@media all and (max-width: 800px){
+    .controller{
+        margin:10px;
+        font-size: 0.8rem;
+    }
+    .controller>div{
+        width: 50px;
+    }
+    .direction{
+        font-size: 0.8rem;
+    }
 }

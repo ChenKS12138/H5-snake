@@ -7,14 +7,14 @@
     <script src="./rsc/jquery.js"></script>
     <link rel="stylesheet" href="./rsc/materialize.css">
     <link rel="stylesheet" href="./rsc/materialize-icon.css">
-    <link rel="stylesheet" href="./index.css">
+    <link rel="stylesheet" href="./scoreBoard.css">
     <script src="./rsc/materialize.js"></script>
-    <title>Snake</title>
+    <title>排行榜</title>
 </head>
 <body>
     <nav class="nav-extended orange darken-4">
         <div class="nav-wrapper">
-            <a href="#" class="brand-logo">SNAKE</a>
+            <a href="#" class="brand-logo title">SCOREBOARD</a>
             <a href="#" data-activates="mobile-demo" class="button-collapse"><i class="material-icons">menu</i></a>
             <ul id="nav-mobile" class="right hide-on-med-and-down">
             <li><a href="#">主页</a></li>
@@ -30,37 +30,9 @@
             </ul>
         </div>
     </nav>
-    <p id="score">SCORE:</p>
-    <canvas id='cav'></canvas>
-    <div class="main">
-        <div class="direction">
-            <div>
-                <div id="up">
-                    <p class="button-name">UP</p>
-                </div>
-                <div id="right">
-                    <p class="button-name">RIGHT</p>
-                </div>
-            </div>
-            <div>
-                <div id="left">
-                    <p class="button-name">LEFT</p>
-                </div>
-                <div id="down">
-                    <p class="button-name">DOWN</p>
-                </div>
-            </div>
-        </div>
-        <div class="controller">
-            <div id='sp-button'>
-                <p id="sp-text">NULL</p>
-            </div>
-            <div id='reset-button'>
-                <p id="reset-text">NULL</p>
-            </div>
-        </div>
+    <div class="card-panel orange draked-4">
+        <p class="white-text main">这里什么都没有</p>
     </div>
-    <script src="./index.js"></script>
     <script>
             $(".button-collapse").sideNav();
     </script>

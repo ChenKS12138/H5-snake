@@ -15,7 +15,7 @@ const backGroundColor="Snow";
 const snackColor="#008B00";
 const canvasBackGroundColor="snow";
 const foodColor="#FFD700";
-const speed=200;
+// let speed=200;
 
 let size=400;//canvas的宽度和长度
 let cellNum=20;//canvas 中一行的格子数
@@ -144,6 +144,7 @@ function Controller(snake,food){
     let work=true;
     let pop;
     let t;
+    let speed=200;
     function pause(changeContent){
         work=!work;
         if(!changeContent){
@@ -252,5 +253,11 @@ let score=0;
     resetButton.addEventListener('click',function(){
         window.location.reload();
     })
-
 })();
+
+let li=document.querySelectorAll('li');
+li.forEach(function(value){
+    value.addEventListener('click',function(){
+        alert('开发中');
+    })
+})

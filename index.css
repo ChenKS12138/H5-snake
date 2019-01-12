@@ -42,7 +42,7 @@ body{
     cursor: pointer;
 }
 .direction>div>div:active{
-    background-color: #e65100;
+    background-color: #f57c00;
 }
 .button-name{
     transform: rotate(-45deg);
@@ -83,11 +83,14 @@ body{
     cursor: pointer;
 }
 .controller>div:active{
-    background-color: #e65100;
+    background-color: #f57c00;
 }
 .controller>div>p{
     padding: 0;
     margin: 0;
+    word-wrap: break-word;
+    word-break: break-all;
+    width: 80%;
 }
 
 @media all and (max-width: 800px){

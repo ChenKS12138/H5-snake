@@ -169,7 +169,7 @@ function Controller(snake,food){
                 }
                 if(snake.crash()){
                     clearInterval(t);
-                    alert('你输了!\n刷新网页以重新开始');
+                    alert('HAHAHAHAHA你输了!');
                 }
                 pop=snake.move();
                 draw(pop,backGroundColor);
@@ -227,7 +227,9 @@ let score=0;
                 e.returnValue=false;
                 break;
             case 80:
+            case 32:
                 controller.pause();
+                e.returnValue=false;
         }
     });
     

@@ -255,9 +255,11 @@ let score=0;
     })
 })();
 
-let li=document.querySelectorAll('li');
-li.forEach(function(value){
-    value.addEventListener('click',function(){
-        alert('开发中');
+(function dev(){
+    let li=document.querySelectorAll('li');
+    li.forEach(function(value){
+        value.addEventListener('click',function(){
+            alert('开发中');
+        })
     })
-})
+})()

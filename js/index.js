@@ -18,7 +18,7 @@ const foodColor="#FFD700";
 
 let size=400;//canvas的宽度和长度
 let cellNum=20;//canvas 中一行的格子数
-let edgeSize=1;//格子间的缝的大小
+let edgeSize=-0.0001;//格子间的缝的大小
 
 (function init(){
     let width=window.screen.width;
@@ -43,12 +43,39 @@ function draw(point,color){
 }
 
 function Snake() {
-    let body= new Array(23,22,21);//第一个元素为蛇的头
+    let body= new Array();//第一个元素为蛇的头
     //point 表示蛇的头
-    let direction=1;// 1为向右，-1为向左，25为向下，-25为向上
+    let direction=1;// 1为向右，-1为向左，cellNum为向下，-cellNum为向上
     let pop;
     let point;
+    let length=3;
+    let direcList=[1,-1,cellNum,-cellNum];
 
+    (function initialPosition(lastOne,lastDir){
+        let temp;
+        let direc=direcList[~~(Math.random()*10%4)];
+        if(!lastOne){
+            temp=~~(Math.random()*1000%(cellNum*cellNum-2));
+        }
+        else{
+            while(direc===-lastDir){
+                direc=direcList[~~(Math.random()*10%4)];
+            }
+            temp=lastOne+direc;
+        }
+        if(body.length<length){
+            if(!inDangerZone(temp)){
+                body.unshift(temp);
+                initialPosition(temp,direc);
+            }
+            else{
+                initialPosition(lastOne,lastDir);
+            }
+        }
+        else{
+            direction=lastDir;
+        }
+    })()
 
     function move(){
         let body=this.body;
@@ -59,11 +86,29 @@ function Snake() {
         this.point=body[0];
         return this.pop;
     }
+    function inDangerZone(target){
+        let point=target;
+        if(point>-1&&point<cellNum){
+            return -cellNum;
+        }
+        else if(point>(cellNum*cellNum-1-cellNum)&&point<cellNum*cellNum){
+            return cellNum;
+        }
+        else if(point%cellNum===0){
+            return -1;
+        }
+        else if((point+1)%cellNum===0){
+            return 1;
+        }
+        else{
+            return 0;
+        }
+    }
     function crash(){
         let body=this.body;
         let point=body[0];
         let direction=this.direction;
-        if((direction===-cellNum&&point>-1&&point<cellNum)||(direction===cellNum&&point>(cellNum*cellNum-cellNum-1)&&point<(cellNum*cellNum))||(direction===-1&&(point)%cellNum===0)||(direction===1&&(point+1)%cellNum===0)){
+        if(direction===inDangerZone(body[0])){
             return 2;
         }
         if(body.lastIndexOf(point)!==0){
@@ -117,6 +162,7 @@ function Snake() {
         crash:crash,
         getFood:getFood,
         changeDirection:changeDirection,
+        length:length,
     }
 }
 function Food(){
@@ -187,7 +233,6 @@ function Controller(snake,food){
             if(snake.getFood(food.position)){
                 score++;
                 speed=Speed(speed*0.97);
-                console.log(Speed());
                 food.foodExist=false;
                 scoreText.innerText=scoreRowText+String(score);
             }

@@ -15,7 +15,6 @@ const backGroundColor="Snow";
 const snackColor="#008B00";
 const canvasBackGroundColor="snow";
 const foodColor="#FFD700";
-// let speed=200;
 
 let size=400;//canvas的宽度和长度
 let cellNum=20;//canvas 中一行的格子数
@@ -64,9 +63,6 @@ function Snake() {
         let body=this.body;
         let point=body[0];
         let direction=this.direction;
-        // if((direction===-cellNum&&point<0&&body[1]<cellNum)||(direction===cellNum&&body[1]>(cellNum*cellNum-cellNum-1)&&body[1]<(cellNum*cellNum))&&point>cellNum*cellNum-1||(direction===-1&&body[1]%cellNum===0&&(point+1)%cellNum===0)||(direction===1&&(point+1)%cellNum===0)){
-        //     return 2;
-        // }
         if((direction===-cellNum&&point>-1&&point<cellNum)||(direction===cellNum&&point>(cellNum*cellNum-cellNum-1)&&point<(cellNum*cellNum))||(direction===-1&&(point)%cellNum===0)||(direction===1&&(point+1)%cellNum===0)){
             return 2;
         }
@@ -132,7 +128,6 @@ function Food(){
         while(snakeBody.indexOf(randPosition)!==-1){
             randPosition=(~~(Math.random()*1000)%(cellNum*cellNum-2));
         }
-        // this.position=(~~(Math.random()*1000)%(cellNum*cellNum-2));
         this.position=randPosition;
         draw(this.position,foodColor);
     }
@@ -197,9 +192,7 @@ function Controller(snake,food){
                 scoreText.innerText=scoreRowText+String(score);
             }
         }
-        
         Render();
-        
         t=setTimeout(action,Speed());        
     }
     function interval(){
@@ -227,7 +220,6 @@ let controller=new Controller(snake,food);
 let score=0;
 
 (function main(){
-
     food.foodExist=false;
     scoreText.innerText=scoreRowText+String(score);
 
@@ -286,7 +278,7 @@ let score=0;
     let li=document.querySelectorAll('li');
     li.forEach(function(value){
         value.addEventListener('click',function(){
-            alert('开发中');
+            alert('开发中!\n敬请期待');
         })
     })
 })()

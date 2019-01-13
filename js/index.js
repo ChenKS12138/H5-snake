@@ -115,15 +115,16 @@ function Snake() {
                 return 1;
             }
             else{
-                if(direction!==1&&(point%cellNum===0)){
+                if((point===0||point===cellNum*cellNum-cellNum)&&direction==-1){
                     return 1;
                 }
-                else if(direction!==-1&&((point+1)%cellNum===0)){
+                else if((point===cellNum-1||point===cellNum*cellNum-1)&&direction===1){
                     return 1;
                 }
                 else{
                     return 0;
                 }
+                return 0;
             }
         }
     }

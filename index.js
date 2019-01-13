@@ -64,6 +64,9 @@ function Snake() {
         let body=this.body;
         let point=body[0];
         let direction=this.direction;
+        // if((direction===-cellNum&&point<0&&body[1]<cellNum)||(direction===cellNum&&body[1]>(cellNum*cellNum-cellNum-1)&&body[1]<(cellNum*cellNum))&&point>cellNum*cellNum-1||(direction===-1&&body[1]%cellNum===0&&(point+1)%cellNum===0)||(direction===1&&(point+1)%cellNum===0)){
+        //     return 2;
+        // }
         if((direction===-cellNum&&point>-1&&point<cellNum)||(direction===cellNum&&point>(cellNum*cellNum-cellNum-1)&&point<(cellNum*cellNum))||(direction===-1&&(point)%cellNum===0)||(direction===1&&(point+1)%cellNum===0)){
             return 2;
         }
@@ -156,35 +159,58 @@ function Controller(snake,food){
             snake.changeDirection(direc);
         }
     }
-    function interval(){
-        t=setInterval(function(){
-            if(work){
-                if(!food.foodExist){
-                    food.createFood(snake.body);
-                    food.foodExist=true;
-                }
-                if(snake.getFood(food.position)){
-                    score++;
-                    food.foodExist=false;
-                    scoreText.innerText=scoreRowText+String(score);
-                }
-                if(snake.crash()){
-                    clearInterval(t);
+    function Speed(value){
+        if(value){
+            speed=value;
+        }
+        return speed;
+    }
+    function Render(){
+        draw(pop,backGroundColor);
+        snake.body.map(function(value,index){
+            draw(value,snackColor);
+        });
+    }
+    function action(){
+        
+        if(work){
+            if(snake.crash()){
+                clearTimeout(t);
+                work=!work;
+                setTimeout(function(){
                     alert('HAHAHAHAHA你输了!');
-                }
-                pop=snake.move();
-                draw(pop,backGroundColor);
+                },200);
             }
-            snake.body.map(function(value,index){
-                draw(value,snackColor);
-            });
-        },speed);
+            else{
+                Render();
+                pop=snake.move();
+            }
+            if(!food.foodExist){
+                food.createFood(snake.body);
+                food.foodExist=true;
+            }
+            if(snake.getFood(food.position)){
+                score++;
+                speed=Speed(speed*0.95);
+                console.log(Speed());
+                food.foodExist=false;
+                scoreText.innerText=scoreRowText+String(score);
+            }
+        }
+        
+        Render();
+        
+        t=setTimeout(action,Speed());        
+    }
+    function interval(){
+        t=setTimeout(action,Speed());
         pause(true);
     }
     return{
         interval:interval,
         pause:pause,
         direction:direction,
+        Speed:Speed,
     }
 }
 
@@ -204,6 +230,7 @@ let score=0;
 
     food.foodExist=false;
     scoreText.innerText=scoreRowText+String(score);
+
     controller.interval();
 
     document.addEventListener('keydown',function(e){

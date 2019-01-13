@@ -246,7 +246,7 @@ function Controller(snake,food){
                 work=!work;
                 snake.live=false;
                 setTimeout(function(){
-                    Materialize.toast('HAHAHAHAHA你输了!', 20000);
+                    Materialize.toast('HAHAHAHAHA 你输了!', 20000);
                 },200);
             }
             else{

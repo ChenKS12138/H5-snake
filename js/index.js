@@ -42,24 +42,30 @@ function draw(point,color){
     box.fillRect((point%cellNum)*(size/cellNum)+1,(~~(point/cellNum))*(size/cellNum)+edgeSize,(size/cellNum)-2*edgeSize,(size/cellNum)-2*edgeSize);
 }
 
+function randomElement(arr){
+    return arr[~~(Math.random()*10%arr.length)];
+}
+
 function Snake() {
     let body= new Array();//第一个元素为蛇的头
     //point 表示蛇的头
     let direction=1;// 1为向右，-1为向左，cellNum为向下，-cellNum为向上
     let pop;
     let point;
+    let live=true;
     let length=3;
     let direcList=[1,-1,cellNum,-cellNum];
 
     (function initialPosition(lastOne,lastDir){
         let temp;
-        let direc=direcList[~~(Math.random()*10%4)];
+        // let direc=direcList[~~(Math.random()*10%4)];
+        let direc=randomElement(direcList);
         if(!lastOne){
             temp=~~(Math.random()*1000%(cellNum*cellNum-2));
         }
         else{
             while(direc===-lastDir){
-                direc=direcList[~~(Math.random()*10%4)];
+                direc=randomElement(direcList);
             }
             temp=lastOne+direc;
         }
@@ -86,29 +92,46 @@ function Snake() {
         this.point=body[0];
         return this.pop;
     }
-    function inDangerZone(target){
+    function inDangerZone(target,direction){
         let point=target;
+        let resc=0;
         if(point>-1&&point<cellNum){
-            return -cellNum;
+            resc=-cellNum;
         }
         else if(point>(cellNum*cellNum-1-cellNum)&&point<cellNum*cellNum){
-            return cellNum;
+            resc=cellNum;
         }
         else if(point%cellNum===0){
-            return -1;
+            resc=-1;
         }
         else if((point+1)%cellNum===0){
-            return 1;
+            resc=1;
+        }
+        if(!direction){
+            return resc; 
         }
         else{
-            return 0;
+            if(direction===resc){
+                return 1;
+            }
+            else{
+                if(direction!==1&&(point%cellNum===0)){
+                    return 1;
+                }
+                else if(direction!==-1&&((point+1)%cellNum===0)){
+                    return 1;
+                }
+                else{
+                    return 0;
+                }
+            }
         }
     }
     function crash(){
         let body=this.body;
         let point=body[0];
         let direction=this.direction;
-        if(direction===inDangerZone(body[0])){
+        if(inDangerZone(body[0],direction)){
             return 2;
         }
         if(body.lastIndexOf(point)!==0){
@@ -163,6 +186,7 @@ function Snake() {
         getFood:getFood,
         changeDirection:changeDirection,
         length:length,
+        live:live,
     }
 }
 function Food(){
@@ -190,9 +214,11 @@ function Controller(snake,food){
     let t;
     let speed=200;
     function pause(changeContent){
-        work=!work;
-        if(!changeContent){
-            spText.innerText=spTextContent[~~work];
+        if(snake.live){
+            work=!work;
+            if(!changeContent){
+                spText.innerText=spTextContent[~~work];
+            }
         }
     }
     function direction(direc){
@@ -218,8 +244,9 @@ function Controller(snake,food){
             if(snake.crash()){
                 clearTimeout(t);
                 work=!work;
+                snake.live=false;
                 setTimeout(function(){
-                    alert('HAHAHAHAHA你输了!');
+                    Materialize.toast('HAHAHAHAHA你输了!', 20000);
                 },200);
             }
             else{
@@ -235,6 +262,8 @@ function Controller(snake,food){
                 speed=Speed(speed*0.97);
                 food.foodExist=false;
                 scoreText.innerText=scoreRowText+String(score);
+                let toastList=['得分啦!','加油鸭!','太棒啦!'];
+                Materialize.toast(randomElement(toastList), 1000);
             }
         }
         Render();

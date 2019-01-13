@@ -186,7 +186,7 @@ function Controller(snake,food){
             }
             if(snake.getFood(food.position)){
                 score++;
-                speed=Speed(speed*0.95);
+                speed=Speed(speed*0.97);
                 console.log(Speed());
                 food.foodExist=false;
                 scoreText.innerText=scoreRowText+String(score);
@@ -248,7 +248,12 @@ let score=0;
                 break;
             case 80:
             case 32:
-                controller.pause();
+            case 13:
+                spButton.click();
+                e.returnValue=false;
+                break;
+            case 82:
+                resetButton.click();
                 e.returnValue=false;
         }
     });

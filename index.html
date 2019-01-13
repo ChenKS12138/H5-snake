@@ -11,6 +11,14 @@
     <link rel="stylesheet" href="./css/index.css">
     <script src="./rsc/materialize.js"></script>
     <title>Snake</title>
+    <meta name="screen-orientation" content="portrait">
+    <meta name="full-screen" content="yes">
+    <meta name="browsermode" content="application">
+    <meta name="x5-orientation" content="portrait">
+    <meta name="x5-fullscreen" content="true">
+    <meta name="x5-page-mode" content="app">
+    <meta name="HandheldFriendly" content="true">
+    <meta name="MobileOptimized" content="320">
 </head>
 <body>
     <nav class="nav-extended orange darken-4">
@@ -19,12 +27,14 @@
             <a href="#" data-activates="mobile-demo" class="button-collapse"><i class="material-icons">menu</i></a>
             <ul id="nav-mobile" class="right hide-on-med-and-down">
             <li><a href="#">主页</a></li>
+            <li><a href="#">多人模式</a></li>
             <li><a href="#">排行榜</a></li>
             <li><a href="#">Q&A</a></li>
             <li><a href="#">关于我</a></li>
             </ul>
             <ul class="side-nav" id="mobile-demo">
             <li><a href="#">主页</a></li>
+            <li><a href="#">多人模式</a></li>
             <li><a href="#">排行榜</a></li>
             <li><a href="#">Q&A</a></li>
             <li><a href="#">关于我</a></li>
@@ -32,7 +42,7 @@
         </div>
     </nav>
     <p id="score">SCORE:</p>
-    <canvas id='cav'></canvas>
+    <canvas id='cav'>您的浏览器版本过低,推荐是使用最新版的Chrome浏览器</canvas>
     <div class="main">
         <div class="direction">
             <div>

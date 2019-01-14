@@ -124,7 +124,6 @@ function Snake() {
                 else{
                     return 0;
                 }
-                return 0;
             }
         }
     }
@@ -247,7 +246,9 @@ function Controller(snake,food){
                 work=!work;
                 snake.live=false;
                 setTimeout(function(){
-                    Materialize.toast('HAHAHAHAHA 你输了!', 20000);
+                    Materialize.toast('HAHAHAHAHA 你输了!', 2500,'',function(){
+                        Materialize.toast('点击RESET或R以重新开始',300000);
+                    });
                 },200);
             }
             else{

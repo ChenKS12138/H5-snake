@@ -27,6 +27,10 @@ let edgeSize=-0.0001;//格子间的缝的大小
             size = 300;
             cellNum = 20;
         }
+        else{
+            size = 480;
+            cellNum=20;
+        }
 
         cav.width = size;
         cav.height = size;

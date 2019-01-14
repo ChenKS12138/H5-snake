@@ -16,23 +16,28 @@ const snackColor="#008B00";
 const canvasBackGroundColor="snow";
 const foodColor="#FFD700";
 
-let size=400;//canvas的宽度和长度
+let size=480;//canvas的宽度和长度
 let cellNum=20;//canvas 中一行的格子数
 let edgeSize=-0.0001;//格子间的缝的大小
 
-(function init(){
-    let width=window.screen.width;
-    if(width<1000){
-        size=300;
-        cellNum=20;
+(function(){
+    function init() {
+        let width = window.innerWidth;
+        if (width < 600) {
+            size = 300;
+            cellNum = 20;
+        }
+
+        cav.width = size;
+        cav.height = size;
+
+        spText.innerText = 'START';
+        resetText.innerText = 'RESET';
+        window.onresize=init;
     }
-
-    cav.width=size;
-    cav.height=size;
-
-    spText.innerText='START';
-    resetText.innerText='RESET';
-})()
+    init();
+}
+)()
 
 function draw(point,color){
     // point 取值0-624

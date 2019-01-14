@@ -21,6 +21,7 @@ body{
 #cav{
     margin: 0rem 3rem 0rem 3rem;
     margin-top: 0;
+    border: 0.8rem #696969 solid;
 }
 .main{
     display: flex;
@@ -95,7 +96,7 @@ body{
     width: 80%;
 }
 
-@media all and (max-width: 800px){
+@media all and (max-width: 600px){
     .controller{
         margin:10px;
         font-size: 0.8rem;
@@ -117,5 +118,8 @@ body{
     }
     .title{
         margin-left: 0;
+    }
+    #cav{
+        border: 0.4rem #696969 solid;
     }
 }

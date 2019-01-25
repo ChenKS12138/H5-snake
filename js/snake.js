@@ -131,7 +131,7 @@ function Snake() {
 function Food(){
     let foodExist;
     let position;
-    function createFood(snakeBody){
+    function createFood(snakeBody,foodColor){
         foodExist=this.foodExist;
         let randPosition=(~~(Math.random()*1000)%(cellNum*cellNum-2));
         while(snakeBody.indexOf(randPosition)!==-1){
@@ -149,7 +149,10 @@ function Food(){
 
 
 
-function Controller(){
+function Controller(configObject){
+    const snackColor=configObject.snackColor;
+    const foodColor=configObject.foodColor;
+    
     let snake=new Snake();
     let food=new Food();
     let work=true;
@@ -220,7 +223,7 @@ function Controller(){
                 pop=snake.move();
             }
             if(!food.foodExist){
-                food.createFood(snake.body);
+                food.createFood(snake.body,foodColor);
                 food.foodExist=true;
             }
             if(snake.getFood(food.position)){

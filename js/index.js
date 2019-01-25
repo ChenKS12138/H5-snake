@@ -1,31 +1,8 @@
-(function init(){
-        let width = window.innerWidth;
-        if (width < 600) {
-            size = 300;
-            cellNum = 20;
-        }
-        else{
-            size = 480;
-            cellNum=20;
-        }
+let controller=new Controller({
+    snackColor:"#008B00",
+    foodColor:"#FFD700",
+});
 
-        cav.width = size;
-        cav.height = size;
-
-        spText.innerText = 'START';
-        resetText.innerText = 'RESET';
-        window.onresize=init;
-}
-)();
-
-(function ready(){
-    cav.style.backgroundColor=canvasBackGroundColor;
-    for(let i=0;i<cellNum*cellNum;i++){
-        draw(i,backGroundColor);
-    }
-})();
-
-let controller=new Controller();
 (function main(){
     controller.initialize();
     document.addEventListener('keydown',function(e){
@@ -91,4 +68,4 @@ let controller=new Controller();
             })
         }
     })
-})()
+})();

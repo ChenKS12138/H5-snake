@@ -89,7 +89,7 @@ function Snake() {
             }
         }
     }
-    function crash(){
+    function crash(target){
         let body=this.body;
         let point=body[0];
         let direction=this.direction;
@@ -100,7 +100,15 @@ function Snake() {
             return 1; 
         }
         else{
-            return 0;
+            if(target){
+                console.log(target,point);
+                if(target.indexOf(point)!==-1){
+                    return 3;
+                }
+            }
+            else{
+                return 0;
+            }
         }
     }
     function getFood(position){
@@ -149,12 +157,13 @@ function Food(){
 
 
 
-function Controller(configObject){
+function Controller(configObject,isInitialize){
     const snackColor=configObject.snackColor;
     const foodColor=configObject.foodColor;
     
     let snake=new Snake();
     let food=new Food();
+    let competitorBody=[1,23];
     let work=true;
     let score=0;
     let pop;
@@ -208,7 +217,7 @@ function Controller(configObject){
     }
     function action(){
         if(work){
-            if(snake.crash()){
+            if(snake.crash(competitorBody)){
                 clearTimeout(t);
                 work=!work;
                 snake.live=false;
@@ -244,11 +253,19 @@ function Controller(configObject){
         t=setTimeout(action,Speed());
         pause(true);
     }
+    if(isInitialize){
+        initialize();
+    }
+    function setCompetitorBody(target){
+        competitorBody=target;
+    }
     return{
         initialize:initialize,
         pause:pause,
         direction:direction,
         Speed:Speed,
         score:score,
+        body:snake.body,
+        setCompetitorBody:setCompetitorBody
     }
 }

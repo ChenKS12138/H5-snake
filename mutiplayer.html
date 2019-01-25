@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#e65100">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script src="./rsc/jquery.js"></script>
+    <link rel="stylesheet" href="./rsc/materialize.css">
+    <link rel="stylesheet" href="./rsc/materialize-icon.css">
+    <link rel="stylesheet" href="./css/mutiplayer.css">
+    <script src="./rsc/materialize.js"></script>
+    <title>多人模式</title>
+    <meta name="screen-orientation" content="portrait">
+    <meta name="full-screen" content="yes">
+    <meta name="browsermode" content="application">
+    <meta name="x5-orientation" content="portrait">
+    <meta name="x5-fullscreen" content="true">
+    <meta name="x5-page-mode" content="app">
+    <meta name="HandheldFriendly" content="true">
+    <meta name="MobileOptimized" content="320">
+</head>
+<body>
+    <nav class="nav-extended orange darken-4">
+        <div class="nav-wrapper">
+            <a href="#" class="brand-logo title">多人模式</a>
+            <a href="#" data-activates="mobile-demo" class="button-collapse"><i class="material-icons">menu</i></a>
+            <ul id="nav-mobile" class="right hide-on-med-and-down">
+            <li><a href="#">主页</a></li>
+            <li><a href="#">多人模式</a></li>
+            <li><a href="#">排行榜</a></li>
+            <li><a href="#">Q&A</a></li>
+            <li><a href="#">关于我</a></li>
+            </ul>
+            <ul class="side-nav" id="mobile-demo">
+            <li><a href="#">主页</a></li>
+            <li><a href="#">多人模式</a></li>
+            <li><a href="#">排行榜</a></li>
+            <li><a href="#">Q&A</a></li>
+            <li><a href="#">关于我</a></li>
+            </ul>
+        </div>
+    </nav>
+    <p id="score">SCORE:</p>
+    <canvas id='cav'>您的浏览器版本过低,推荐是使用最新版的Chrome浏览器</canvas>
+    <div class="main">
+        <div class="direction hide-on-med-and-up">
+            <div>
+                <div id="up">
+                    <p class="button-name">UP</p>
+                </div>
+                <div id="right">
+                    <p class="button-name">RIGHT</p>
+                </div>
+            </div>
+            <div>
+                <div id="left">
+                    <p class="button-name">LEFT</p>
+                </div>
+                <div id="down">
+                    <p class="button-name">DOWN</p>
+                </div>
+            </div>
+        </div>
+        <div class="controller">
+            <div id='sp-button'>
+                <p id="sp-text">NULL</p>
+            </div>
+            <div id='reset-button'>
+                <p id="reset-text">NULL</p>
+            </div>
+        </div>
+    </div>
+    <script src="./js/snake.js"></script>
+    <script src="./js/config.js"></script>
+    <script src="./js/mutiplayer.js"></script>
+    <script>
+            $(".button-collapse").sideNav();
+    </script>
+</body>
+</html>

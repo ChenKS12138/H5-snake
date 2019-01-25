@@ -20,8 +20,7 @@ let size=480;//canvas的宽度和长度
 let cellNum=20;//canvas 中一行的格子数
 let edgeSize=-0.0001;//格子间的缝的大小
 
-(function(){
-    function init() {
+(function init(){
         let width = window.innerWidth;
         if (width < 600) {
             size = 300;
@@ -38,8 +37,6 @@ let edgeSize=-0.0001;//格子间的缝的大小
         spText.innerText = 'START';
         resetText.innerText = 'RESET';
         window.onresize=init;
-    }
-    init();
 }
 )()
 
@@ -55,12 +52,13 @@ function randomElement(arr){
     return arr[~~(Math.random()*10%arr.length)];
 }
 
+
+
+
+
 function Snake() {
     let body= new Array();//第一个元素为蛇的头
-    //point 表示蛇的头
     let direction=1;// 1为向右，-1为向左，cellNum为向下，-cellNum为向上
-    let pop;
-    let point;
     let live=true;
     let length=3;
     let direcList=[1,-1,cellNum,-cellNum];
@@ -155,35 +153,11 @@ function Snake() {
         let pop=this.pop;
         let point=body[0];
         if(position===point){
-            snake.body.push(pop);
+            body.push(pop);
             return 1;
         }
         else{
             return 0;
-        }
-    }
-    function changeDirection(dir){
-        switch(dir){
-            case 'up': 
-                if(this.direction!==cellNum){
-                    this.direction=-cellNum;
-                };
-                break;
-            case 'down':
-                if(this.direction!==-cellNum){
-                    this.direction=cellNum;
-                }
-                break;
-            case 'left':
-                if(this.direction!==1){
-                    this.direction=-1;
-                }
-                break;
-            case 'right':
-                if(this.direction!==-1){
-                    this.direction=1;
-                }
-                break;
         }
     }
 
@@ -193,7 +167,6 @@ function Snake() {
         move:move,
         crash:crash,
         getFood:getFood,
-        changeDirection:changeDirection,
         length:length,
         live:live,
     }
@@ -217,8 +190,11 @@ function Food(){
     }
 }
 
-function Controller(snake,food){
+function Controller(){
+    let snake=new Snake();
+    let food=new Food();
     let work=true;
+    let score=0;
     let pop;
     let t;
     let speed=200;
@@ -232,7 +208,28 @@ function Controller(snake,food){
     }
     function direction(direc){
         if(work){
-            snake.changeDirection(direc);
+            switch(direc){
+                case 'up': 
+                    if(snake.direction!==cellNum){
+                        snake.direction=-cellNum;
+                    };
+                    break;
+                case 'down':
+                    if(snake.direction!==-cellNum){
+                        snake.direction=cellNum;
+                    }
+                    break;
+                case 'left':
+                    if(snake.direction!==1){
+                        snake.direction=-1;
+                    }
+                    break;
+                case 'right':
+                    if(snake.direction!==-1){
+                        snake.direction=1;
+                    }
+                    break;
+            }
         }
     }
     function Speed(value){
@@ -248,7 +245,6 @@ function Controller(snake,food){
         });
     }
     function action(){
-        
         if(work){
             if(snake.crash()){
                 clearTimeout(t);
@@ -280,15 +276,18 @@ function Controller(snake,food){
         Render();
         t=setTimeout(action,Speed());        
     }
-    function interval(){
+    function initialize(){
+        food.foodExist=false;
+        scoreText.innerText=scoreRowText+String(score);
         t=setTimeout(action,Speed());
         pause(true);
     }
     return{
-        interval:interval,
+        initialize:initialize,
         pause:pause,
         direction:direction,
         Speed:Speed,
+        score:score,
     }
 }
 
@@ -299,17 +298,9 @@ function Controller(snake,food){
     }
 })();
 
-let snake=new Snake();
-let food=new Food();
-let controller=new Controller(snake,food);
-let score=0;
-
+let controller=new Controller();
 (function main(){
-    food.foodExist=false;
-    scoreText.innerText=scoreRowText+String(score);
-
-    controller.interval();
-
+    controller.initialize();
     document.addEventListener('keydown',function(e){
         switch(e.keyCode){
             case 38:
@@ -366,9 +357,11 @@ let score=0;
 
 (function dev(){
     let li=document.querySelectorAll('li');
-    li.forEach(function(value){
-        value.addEventListener('click',function(){
-            alert('开发中!\n敬请期待');
-        })
+    li.forEach(function(value,index){
+        if(index!==0){
+            value.addEventListener('click',function(){
+                alert('开发中!\n敬请期待');
+            })
+        }
     })
 })()

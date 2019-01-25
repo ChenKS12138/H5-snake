@@ -18,29 +18,30 @@ let size=480;//canvas的宽度和长度
 let cellNum=20;//canvas 中一行的格子数
 let edgeSize=-0.0001;//格子间的缝的大小
 
-(function init(){
-    let width = window.innerWidth;
-    if (width < 600) {
-        size = 300;
-        cellNum = 20;
-    }
-    else{
-        size = 480;
-        cellNum=20;
-    }
+(function (){
+    (function init(){
+        let width = window.innerWidth;
+        if (width < 600) {
+            size = 300;
+            cellNum = 20;
+        }
+        else{
+            size = 480;
+            cellNum=20;
+        }
 
-    cav.width = size;
-    cav.height = size;
+        cav.width = size;
+        cav.height = size;
 
-    spText.innerText = 'START';
-    resetText.innerText = 'RESET';
-    window.onresize=init;
+        spText.innerText = 'START';
+        resetText.innerText = 'RESET';
+        window.onresize=init;
+    })();
+    (function ready(){
+        cav.style.backgroundColor=canvasBackGroundColor;
+        for(let i=0;i<cellNum*cellNum;i++){
+            draw(i,backGroundColor);
+        }
+    })();
 }
 )();
-
-(function ready(){
-cav.style.backgroundColor=canvasBackGroundColor;
-for(let i=0;i<cellNum*cellNum;i++){
-    draw(i,backGroundColor);
-}
-})();

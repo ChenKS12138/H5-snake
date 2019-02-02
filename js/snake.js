@@ -101,7 +101,6 @@ function Snake() {
         }
         else{
             if(target){
-                console.log(target,point);
                 if(target.indexOf(point)!==-1){
                     return 3;
                 }
@@ -163,7 +162,7 @@ function Controller(configObject,isInitialize){
     
     let snake=new Snake();
     let food=new Food();
-    let competitorBody=[1,23];
+    let competitorController;
     let work=true;
     let score=0;
     let pop;
@@ -217,7 +216,7 @@ function Controller(configObject,isInitialize){
     }
     function action(){
         if(work){
-            if(snake.crash(competitorBody)){
+            if(snake.crash(competitorController.body)){
                 clearTimeout(t);
                 work=!work;
                 snake.live=false;
@@ -256,8 +255,8 @@ function Controller(configObject,isInitialize){
     if(isInitialize){
         initialize();
     }
-    function setCompetitorBody(target){
-        competitorBody=target;
+    function setCompetitorController(target){
+        competitorController=target;
     }
     return{
         initialize:initialize,
@@ -266,6 +265,7 @@ function Controller(configObject,isInitialize){
         Speed:Speed,
         score:score,
         body:snake.body,
-        setCompetitorBody:setCompetitorBody
+        foodPosition:food.position,
+        setCompetitorController:setCompetitorController,
     }
 }

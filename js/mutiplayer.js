@@ -6,8 +6,8 @@ let controller2=new Controller({
     snackColor:"#6E8B3D",
     foodColor:"#CD8500",
 },true);
-controller1.setCompetitorBody(controller2.body);
-controller2.setCompetitorBody(controller1.body);
+controller1.setCompetitorController(controller2);
+controller2.setCompetitorController(controller1);
 (function main(){
     document.addEventListener('keydown',function(e){
         switch(e.keyCode){

@@ -1,271 +1,243 @@
-function draw(point,color){
-    // point 取值0-624
-    //  每行有25个格子
-    // 0-24 为第一行,以此类推
-    box.fillStyle=color;
-    box.fillRect((point%cellNum)*(size/cellNum)+1,(~~(point/cellNum))*(size/cellNum)+edgeSize,(size/cellNum)-2*edgeSize,(size/cellNum)-2*edgeSize);
-}
-
-function randomElement(arr){
-    return arr[~~(Math.random()*10%arr.length)];
-}
-
-
-function Snake() {
-    let body= new Array();//第一个元素为蛇的头
-    let direction=1;// 1为向右，-1为向左，cellNum为向下，-cellNum为向上
-    let live=true;
-    let length=3;
-    let direcList=[1,-1,cellNum,-cellNum];
-
-    (function initialPosition(lastOne,lastDir){
-        let temp;
-        // let direc=direcList[~~(Math.random()*10%4)];
-        let direc=randomElement(direcList);
-        if(!lastOne){
-            temp=~~(Math.random()*1000%(cellNum*cellNum-2));
-        }
-        else{
-            while(direc===-lastDir){
-                direc=randomElement(direcList);
-            }
-            temp=lastOne+direc;
-        }
-        if(body.length<length){
-            if(!inDangerZone(temp)){
-                body.unshift(temp);
-                initialPosition(temp,direc);
-            }
-            else{
-                initialPosition(lastOne,lastDir);
-            }
-        }
-        else{
-            direction=lastDir;
-        }
-    })()
-
-    function move(){
-        let body=this.body;
-        let direction=this.direction;
-        let point=body[0];
-        this.pop=body.pop();
-        body.unshift(point+direction);
-        this.point=body[0];
-        return this.pop;
-    }
-    function inDangerZone(target,direction){
-        let point=target;
-        let resc=0;
-        if(point>-1&&point<cellNum){
-            resc=-cellNum;
-        }
-        else if(point>(cellNum*cellNum-1-cellNum)&&point<cellNum*cellNum){
-            resc=cellNum;
-        }
-        else if(point%cellNum===0){
-            resc=-1;
-        }
-        else if((point+1)%cellNum===0){
-            resc=1;
-        }
-        if(!direction){
-            return resc; 
-        }
-        else{
-            if(direction===resc){
-                return 1;
-            }
-            else{
-                if((point===0||point===cellNum*cellNum-cellNum)&&direction==-1){
-                    return 1;
+function Controller(Config={
+    el:'#canv',
+    parameter:{
+        size:480,
+        cellNum:20,
+        edgeSize:-0.0001
+    },
+    snakes:[
+        {
+            color:'#008B00',
+            direction:{
+                click:{},
+                keydown:{
+                    'up':[38],
+                    'down':[40],
+                    'left':[37],
+                    'right':[39],
+                },
+            },
+        },
+    ],
+    foods:[
+        {
+            color:'#FFD700',
+        },
+    ]
+}){
+    let el=Config.el;
+    let cellNum=Config.parameter.cellNum;
+    this.platform={
+        _data:{
+            snakes:new Array(),//这是个snake实例的数组
+            foods:new Array(),//这是个food实例的数组
+            wall:new Array(),
+            pixels:new Array(cellNum*cellNum).fill(0),//0表示空，1表示蛇,2表示食物,3表示墙或障碍物
+            isPause:true,
+        },
+        config:{
+            canv:document.querySelector(el),
+            box:canv.getContext('2d'),
+            color:{
+                canvasBackGround:'snow',
+                pixelBackGround:'snow',
+                snakesColor:[],
+                foodsColor:[],
+            },
+            text:{
+                button:{
+                    continue:"CONTINUE",
+                    stop:"STOP",
                 }
-                else if((point===cellNum-1||point===cellNum*cellNum-1)&&direction===1){
-                    return 1;
+            },
+            // parameter:{
+            //     size:480,//canvas的宽度和长度
+            //     cellNum:20,//canvas 中一行的格子数
+            //     edgeSize:-0.0001,//格子间的缝的大小
+            // },
+            parameter:Config.parameter,
+        },
+        draw:function(point,color){
+            // point 取值0-624
+            //  每行有25个格子
+            // 0-24 为第一行,以此类推
+            let {box}=this.config;
+            let {cellNum,size,edgeSize} = this.config.parameter;
+
+            box.fillStyle=color;
+            box.fillRect((point%cellNum)*(size/cellNum)+1,(~~(point/cellNum))*(size/cellNum)+edgeSize,(size/cellNum)-2*edgeSize,(size/cellNum)-2*edgeSize);
+        },
+        render:function(){
+            //根据_data的值，再调用draw(),对canv进行更新，这需要是个setInterval，不管_data.isPause的值，每隔最短的一段时间执行
+            setInterval(function(){
+                let {pixels}=this._data;
+                let {
+                    canvasBackGround,
+                    pixelBackGround,
+                } = this.config.color;
+                let {canv}=this.config;
+                canv.style.backgroundColor=canvasBackGround;
+                pixels.forEach(function(value){
+                    this.draw(value,pixelBackGround);
+                }.bind(this))
+            }.bind(this),1);
+        },
+        update:function(){
+            //根据isPause的真假值，判断是否更新，若更新 ， setTimeOut，则根据遍历snake的move()，修改pixels,再根据food的position是否为null，createFood()
+            setInterval(function(){
+                if(!this._data.isPause){
+                    let {snakes,foods,wall,pixels,isPause} = this._data;
+                    snakes.map(function(val){
+                        val.body.map(function(value){
+                            pixels[value]=1;
+                        });
+                    });
+                    foods.map(function(val){
+                        pixels[val.position]=2;
+                    });
+                    wall.map(function(val){
+                        pixels[val]=3;
+                    });
+                    this._data.pixels=pixels;
+                    snakes.map(function(val,index){
+                        val.move();
+                        if(pixels[val._data.head]===3){
+                            this._data.isPause=true;
+                            val._data.alive=false;
+                        }
+                        else if(pixels[val._data.head]===2){
+                            val._data.score++;
+                            //对speed进行修改
+                        }
+                    });
                 }
-                else{
-                    return 0;
+            }.bind(this),1);
+        },//需要在update函数中移动蛇，并进行判断
+    };
+    (function initData(){
+        Config.snakes.map(function(val,index){
+            this.platform._data.snakes.push(new Snake());
+            let {up,down,left,right} = Config.snakes[index].direction.keydown;
+            document.addEventListener('keyup',function(e){
+                if(up.indexOf(e.keyCode!==-1)){
+                    this.platform._data.snakes[index].direction='up';
                 }
-            }
-        }
-    }
-    function crash(target){
-        let body=this.body;
-        let point=body[0];
-        let direction=this.direction;
-        if(inDangerZone(body[0],direction)){
-            return 2;
-        }
-        if(body.lastIndexOf(point)!==0){
-            return 1; 
-        }
-        else{
-            if(target){
-                if(target.indexOf(point)!==-1){
-                    return 3;
+                else if(down.indexOf(e.keyCode)!==-1){
+                    this.platform._data.snakes[index].direction='donw';
                 }
-            }
-            else{
-                return 0;
-            }
+                else if(left.indexOf(e.keyCode)!==-1){
+                    this.platform._data.snakes[index].direction='left';
+                }
+                else if(right.indexOf(e.keyCode)!==-1){
+                    this.platform._data.snakes[index].direction='right';
+                }
+            }.bind(this))
+            this.platform.config.color.snakesColor.push(val.color);
+        }.bind(this));
+        Config.foods.map(function(val){
+            this.platform._data.foods.push(new Food());
+            this.platform.config.color.foodsColor.push(val.color);
+        }.bind(this));
+        for(let j=0;j<cellNum-1;j++){
+            this.platform._data.wall.push(j,cellNum*(j+1)-1,cellNum*(j+1),cellNum*(cellNum-1)+j+1);
         }
+    }).bind(this)();
+    this.netController={
+        //负责网络部分
+    };
+    function randomElement(arr){
+        return arr[~~(Math.random()*10%arr.length)];
     }
-    function getFood(position){
-        let body=this.body;
-        let pop=this.pop;
-        let point=body[0];
-        if(position===point){
-            body.push(pop);
-            return 1;
+    function pause(){
+        //调整platform._data.isPause;
+        this.platform._data.isPause=!this.platform._data.isPause;
+    };
+    function Food(){
+        this.position=null;
+        let init=function(){
+            setInterval(function createFood(forbidden){
+                if(this.position===null||this.position===undefined){
+                    let randPosition=null;
+                    while(forbidden.indexOf(randPosition)!==-1){
+                        randPosition=(~~(Math.random()*1000)%(cellNum*cellNum-2));;
+                    }
+                    this.position=randPosition;
+                }
+            }.bind(this),1);
         }
-        else{
-            return 0;
+        return{
+            position:this.position,
+            init:init,
         }
-    }
-
-    return {
-        body:body,
-        direction:direction,
-        move:move,
-        crash:crash,
-        getFood:getFood,
-        length:length,
-        live:live,
-    }
-}
-
-
-function Food(){
-    let foodExist;
-    let position;
-    function createFood(snakeBody,foodColor){
-        foodExist=this.foodExist;
-        let randPosition=(~~(Math.random()*1000)%(cellNum*cellNum-2));
-        while(snakeBody.indexOf(randPosition)!==-1){
-            randPosition=(~~(Math.random()*1000)%(cellNum*cellNum-2));
-        }
-        this.position=randPosition;
-        draw(this.position,foodColor);
-    }
-    return{
-        foodExist:foodExist,
-        createFood:createFood,
-        position:position,
-    }
-}
-
-
-
-function Controller(configObject,isInitialize){
-    const snackColor=configObject.snackColor;
-    const foodColor=configObject.foodColor;
-    
-    let snake=new Snake();
-    let food=new Food();
-    let competitorController;
-    let work=true;
-    let score=0;
-    let pop;
-    let t;
-    let speed=200;
-    function pause(changeContent){
-        if(snake.live){
-            work=!work;
-            if(!changeContent){
-                spText.innerText=spTextContent[~~work];
-            }
-        }
-    }
-    function direction(direc){
-        if(work){
-            switch(direc){
-                case 'up': 
-                    if(snake.direction!==cellNum){
-                        snake.direction=-cellNum;
-                    };
+    };
+    function Snake(forbideen=new Array()){
+        //返回一个Snake类
+        this._data={
+            score:0,
+            body:new Array(),
+            length:2,//暂时设定为只能为2,后期再修改
+            head:null,
+            direction:null,//可能的值为'up','down','left','right'
+            speed:1000,
+            alive:true,
+            id:null,
+        };
+        (function initSnake(){
+            let {score,body,length,head,direction,speed,alive,id} = this._data;
+            head=~~(Math.random()*1000%(cellNum*cellNum-2));
+            body.unshift(head);
+            while(body.length!==length){
+                head=head+randomElement([-1,1,cellNum,-cellNum]);
+                if(body.indexOf(head)===-1){
+                    body.unshift(head);
+                }
+            };
+            id=body.toString().split(',').join('');
+            this._data={score,body,length,head,direction,speed,alive,id};
+        }).bind(this)();
+        function move(){
+            let {body,length,head,direction} = this._data;
+            body.pop();
+            let cellNum=config.parameter.cellNum;
+            head=body[0];
+            switch(direction){
+                case 'up':
+                    body.unshift(head -= cellNum);
                     break;
                 case 'down':
-                    if(snake.direction!==-cellNum){
-                        snake.direction=cellNum;
-                    }
+                    body.unshift(head += cellNum);
                     break;
                 case 'left':
-                    if(snake.direction!==1){
-                        snake.direction=-1;
-                    }
+                    body.unshift(head -= 1);
                     break;
                 case 'right':
-                    if(snake.direction!==-1){
-                        snake.direction=1;
-                    }
+                    body.unshift(head += 1);
                     break;
             }
+            this._data={body,length,head,direction};
         }
-    }
-    function Speed(value){
-        if(value){
-            speed=value;
+        function autoMove(){
+            let t=setTimeout(function(){
+                move();
+                t=setTimeout(autoMove.bind(this),this._data.speed);
+            }.bind(this),this._data.speed);
         }
-        return speed;
-    }
-    function Render(){
-        draw(pop,backGroundColor);
-        snake.body.map(function(value,index){
-            draw(value,snackColor);
-        });
-    }
-    function action(){
-        if(work){
-            if(snake.crash(competitorController.body)){
-                clearTimeout(t);
-                work=!work;
-                snake.live=false;
-                setTimeout(function(){
-                    Materialize.toast('HAHAHAHAHA 你输了!', 2500,'',function(){
-                        Materialize.toast('点击RESET或R以重新开始',300000);
-                    });
-                },200);
-            }
-            else{
-                Render();
-                pop=snake.move();
-            }
-            if(!food.foodExist){
-                food.createFood(snake.body,foodColor);
-                food.foodExist=true;
-            }
-            if(snake.getFood(food.position)){
-                score++;
-                speed=Speed(speed*0.97);
-                food.foodExist=false;
-                scoreText.innerText=scoreRowText+String(score);
-                let toastList=['得分啦!','加油鸭!','太棒啦!'];
-                Materialize.toast(randomElement(toastList), 1000);
-            }
+        return {
+            move:move,
+            _data:this._data,
+            autoMove:autoMove,
         }
-        Render();
-        t=setTimeout(action,Speed());        
-    }
-    function initialize(){
-        food.foodExist=false;
-        scoreText.innerText=scoreRowText+String(score);
-        t=setTimeout(action,Speed());
-        pause(true);
-    }
-    if(isInitialize){
-        initialize();
-    }
-    function setCompetitorController(target){
-        competitorController=target;
+    };
+    function initController(){
+        this.platform.update();
+        this.platform.render();
     }
     return{
-        initialize:initialize,
+        //返回一个类
+        el:el,
+        platform:this.platform,
         pause:pause,
-        direction:direction,
-        Speed:Speed,
-        score:score,
-        body:snake.body,
-        foodPosition:food.position,
-        setCompetitorController:setCompetitorController,
+        netController:this.netController,
+        init:initController,
     }
 }

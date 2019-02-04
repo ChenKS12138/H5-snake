@@ -1,6 +1,23 @@
-function Controller(){
-    this.el='#canv';
-    let platform={
+function Controller(Config={
+    el:'#canv',
+    parameter:{
+        size:480,
+        cellNum:20,
+        edgeSize:-0.0001
+    },
+    snakes:[
+        {
+            color:'#008B00',
+        },
+    ],
+    foods:[
+        {
+            color:'#FFD700'
+        },
+    ]
+}){
+    this.el=Config.el;
+    this.platform={
         _data:{
             snakes:new Array(),//这是个snake实例的数组
             foods:new Array(),//这是个food实例的数组
@@ -14,6 +31,8 @@ function Controller(){
             color:{
                 canvasBackGround:'snow',
                 pixelBackGround:'snow',
+                snakesColor:[],
+                foodsColor:[],
             },
             text:{
                 button:{
@@ -21,11 +40,12 @@ function Controller(){
                     stop:"STOP",
                 }
             },
-            parameter:{
-                size:480,//canvas的宽度和长度
-                cellNum:20,//canvas 中一行的格子数
-                edgeSize:-0.0001,//格子间的缝的大小
-            },
+            // parameter:{
+            //     size:480,//canvas的宽度和长度
+            //     cellNum:20,//canvas 中一行的格子数
+            //     edgeSize:-0.0001,//格子间的缝的大小
+            // },
+            parameter:Config.parameter,
         },
         draw:function(point,color){
             // point 取值0-624
@@ -44,7 +64,7 @@ function Controller(){
                 let {
                     canvColor:canvasBackGround,
                     pixelColor:pixelBackGround,
-                }=this.config.color;
+                } = this.config.color;
                 let {canv}=this.config;
                 canv.style.backgroundColor=canvColor;
                 pixels.forEach(function(value){
@@ -87,13 +107,23 @@ function Controller(){
                 }
             }.bind(this),1);
         },//需要在update函数中移动蛇，并进行判断
-        listen:function(){
-            //
-        }
     };
+    (function initData(){
+        Config.snakes.map(function(val){
+            this.platform._data.snakes.push(new Snake());
+            this.platform.config.color.snakesColor.push(val.color);
+        });
+        Config.foods.map(function(val){
+            this.platform._data.foods.push(new Food());
+            this.platform.config.color.foodsColor.push(val.color);
+        });
+    }).bind(this)()
     let netController={
         //负责网络部分
     };
+    function randomElement(arr){
+        return arr[~~(Math.random()*10%arr.length)];
+    }
     function pause(){
         //调整platform._data.isPause;
         this.platform._data.isPause=!this.platform._data.isPause;
@@ -116,17 +146,31 @@ function Controller(){
             init:init,
         }
     };
-    function Snake(){
+    function Snake(forbideen=new Array()){
         //返回一个Snake类
         this._data={
             score:0,
             body:new Array(),
-            length:null,
+            length:2,//暂时设定为只能为2,后期再修改
             head:null,
             direction:null,//可能的值为'up','down','left','right'
             speed:1000,
             alive:true,
+            id:null,
         }
+        (function initial(){
+            let {score,body,length,head,direction,speed,alive,id} = this._data;
+            head=~~(Math.random()*1000%(cellNum*cellNum-2));
+            body.unshift(head);
+            while(body.length!==length){
+                let head=head+randomElement([-1,1,cellNum,-cellNum]);
+                if(body.indexOf(head)===-1){
+                    body.unshift(head);
+                }
+            };
+            id=body.trString().split(',').join('');
+            this._data={score,body,length,head,direction,speed,alive,id};
+        }).bind(this)();
         function move(){
             let {body,length,head,direction} = this._data;
             body.pop();
@@ -157,12 +201,13 @@ function Controller(){
         return {
             move:move,
             _data:this._data,
+            autoMove:autoMove,
         }
     };
     return{
         //返回一个类
         el:this.el,
-        platform:platform,
+        platform:this.platform,
         pause:pause,
     }
 }

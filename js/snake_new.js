@@ -39,21 +39,57 @@ function Controller(){
         },
         render:function(){
             //根据_data的值，再调用draw(),对canv进行更新，这需要是个setInterval，不管_data.isPause的值，每隔最短的一段时间执行
-            let {pixels}=this._data;
-            let {
-                canvColor:canvasBackGround,
-                pixelColor:pixelBackGround,
-            }=this.config.color;
-            let {canv}=this.config;
-            canv.style.backgroundColor=canvColor;
-            pixels.forEach(function(value){
-                draw(value,pixelColor);
-            })
+            setInterval(function(){
+                let {pixels}=this._data;
+                let {
+                    canvColor:canvasBackGround,
+                    pixelColor:pixelBackGround,
+                }=this.config.color;
+                let {canv}=this.config;
+                canv.style.backgroundColor=canvColor;
+                pixels.forEach(function(value){
+                    draw(value,pixelColor);
+                })
+            }.bind(this),1);
         },
         update:function(){
             //根据isPause的真假值，判断是否更新，若更新 ， setTimeOut，则根据遍历snake的move()，修改pixels,再根据food的position是否为null，createFood()
-
-        },
+            setInterval(function(){
+                if(!this._data.isPause){
+                    let {snakes,foods,wall,pixels,isPause} = this._data;
+                    snakes.map(function(val){
+                        val.map(function(value){
+                            pixels[value]=1;
+                        });
+                    });
+                    foods.map(function(val){
+                        val.map(function(value){
+                            pixels[value]=2;
+                        });
+                    });
+                    wall.map(function(val){
+                        val.map(function(value){
+                            pixels[value]=3;
+                        });
+                    });
+                    this._data.pixels=pixels;
+                    snakes.map(function(val,index){
+                        val.move();
+                        if(pixels[val._data.head]===3){
+                            this._data.isPause=true;
+                            val._data.alive=false;
+                        }
+                        else if(pixels[val._data.head]===2){
+                            val._data.score++;
+                            //对speed进行修改
+                        }
+                    })
+                }
+            }.bind(this),1);
+        },//需要在update函数中移动蛇，并进行判断
+        listen:function(){
+            //
+        }
     };
     let netController={
         //负责网络部分
@@ -88,6 +124,8 @@ function Controller(){
             length:null,
             head:null,
             direction:null,//可能的值为'up','down','left','right'
+            speed:1000,
+            alive:true,
         }
         function move(){
             let {body,length,head,direction} = this._data;
@@ -109,6 +147,12 @@ function Controller(){
                     break;
             }
             this._data={body,length,head,direction};
+        }
+        function autoMove(){
+            let t=setTimeout(function(){
+                move();
+                t=setTimeout(autoMove.bind(this),this._data.speed);
+            }.bind(this),this._data.speed);
         }
         return {
             move:move,

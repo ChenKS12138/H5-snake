@@ -109,14 +109,29 @@ function Controller(Config={
                             val._data.score++;
                             //对speed进行修改
                         }
-                    })
+                    });
                 }
             }.bind(this),1);
         },//需要在update函数中移动蛇，并进行判断
     };
     (function initData(){
-        Config.snakes.map(function(val){
+        Config.snakes.map(function(val,index){
             this.platform._data.snakes.push(new Snake());
+            let {up,down,left,right} = Config.snakes[index].direction.keydown;
+            document.addEventListener('keyup',function(e){
+                if(up.indexOf(e.keyCode!==-1)){
+                    this.platform._data.snakes[index].direction='up';
+                }
+                else if(down.indexOf(e.keyCode)!==-1){
+                    this.platform._data.snakes[index].direction='donw';
+                }
+                else if(left.indexOf(e.keyCode)!==-1){
+                    this.platform._data.snakes[index].direction='left';
+                }
+                else if(right.indexOf(e.keyCode)!==-1){
+                    this.platform._data.snakes[index].direction='right';
+                }
+            })
             this.platform.config.color.snakesColor.push(val.color);
         });
         Config.foods.map(function(val){

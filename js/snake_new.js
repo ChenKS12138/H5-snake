@@ -8,21 +8,31 @@ function Controller(Config={
     snakes:[
         {
             color:'#008B00',
+            direction:{
+                click:{},
+                keydown:{
+                    'up':[38],
+                    'down':[40],
+                    'left':[37],
+                    'right':[39],
+                },
+            },
         },
     ],
     foods:[
         {
-            color:'#FFD700'
+            color:'#FFD700',
         },
     ]
 }){
     this.el=Config.el;
+    this.cellNum=Config.parameter.cellNum;
     this.platform={
         _data:{
             snakes:new Array(),//这是个snake实例的数组
             foods:new Array(),//这是个food实例的数组
             wall:new Array(),
-            pixels:new Array(25*25).fill(0),//0表示空，1表示蛇,2表示食物,3表示墙或障碍物
+            pixels:new Array(cellNum*cellNum).fill(0),//0表示空，1表示蛇,2表示食物,3表示墙或障碍物
             isPause:true,
         },
         config:{
@@ -78,19 +88,15 @@ function Controller(Config={
                 if(!this._data.isPause){
                     let {snakes,foods,wall,pixels,isPause} = this._data;
                     snakes.map(function(val){
-                        val.map(function(value){
+                        val.body.map(function(value){
                             pixels[value]=1;
                         });
                     });
                     foods.map(function(val){
-                        val.map(function(value){
-                            pixels[value]=2;
-                        });
+                        pixels[val.position]=2;
                     });
                     wall.map(function(val){
-                        val.map(function(value){
-                            pixels[value]=3;
-                        });
+                        pixels[val]=3;
                     });
                     this._data.pixels=pixels;
                     snakes.map(function(val,index){
@@ -117,8 +123,11 @@ function Controller(Config={
             this.platform._data.foods.push(new Food());
             this.platform.config.color.foodsColor.push(val.color);
         });
-    }).bind(this)()
-    let netController={
+        for(let j=0;j<cellNum-1;j++){
+            this.platform._data.wall.push(j,cellNum*(j+1)-1,cellNum*(j+1),cellNum*(cellNum-1)+j+1);
+        }
+    }).bind(this)();
+    this.netController={
         //负责网络部分
     };
     function randomElement(arr){
@@ -158,7 +167,7 @@ function Controller(Config={
             alive:true,
             id:null,
         }
-        (function initial(){
+        (function initSnake(){
             let {score,body,length,head,direction,speed,alive,id} = this._data;
             head=~~(Math.random()*1000%(cellNum*cellNum-2));
             body.unshift(head);
@@ -204,10 +213,16 @@ function Controller(Config={
             autoMove:autoMove,
         }
     };
+    function initController(){
+        this.platform.update();
+        this.platform.render();
+    }
     return{
         //返回一个类
         el:this.el,
         platform:this.platform,
         pause:pause,
+        netController:this.netController,
+        init:initController,
     }
 }

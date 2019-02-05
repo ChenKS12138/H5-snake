@@ -216,7 +216,7 @@ function Controller(configObject,isInitialize){
     }
     function action(){
         if(work){
-            if(snake.crash(competitorController.body)){
+            if(0){
                 clearTimeout(t);
                 work=!work;
                 snake.live=false;

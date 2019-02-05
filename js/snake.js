@@ -136,7 +136,6 @@ function Controller(Config={
                             val._data.score++;
                             this._data.foods[pixels[val._data.head]-20].position=null;
                             this._data.snakes[index]._data.speed *= 0.97 ;
-                            console.log(this._data.snakes[index]._data.speed);
                             val.getLonger();
                             Materialize.toast(randomElement([
                                 '得分啦!',
@@ -165,12 +164,17 @@ function Controller(Config={
             }.bind(this),1);
         },//需要在update函数中移动蛇，并进行判断
     };
+    function innerPixel(width,offset=0){
+        let res=new Array();
+        for(let j=0;j<width-1-offset*2;j++){
+            res.push(j+offset*(width+1),(width*(j+1)-1)*(offset+1),width*(j+1+offset)+offset,width*(width-1-offset)+j+1+offset);
+        }
+        return res;
+    }
     (function initData(){
         Config.snakes.map(function(val,index){
-            for(let j=0;j<cellNum-1;j++){
-                this.platform._data.wall.push(j,cellNum*(j+1)-1,cellNum*(j+1),cellNum*(cellNum-1)+j+1);
-            }
-            this.platform._data.snakes.push(new Snake([...this.platform._data.wall]));
+            this.platform._data.wall.push(...innerPixel(cellNum));
+            this.platform._data.snakes.push(new Snake([...this.platform._data.wall,...innerPixel(cellNum,1)]));
             this.platform._data.snakes[index].autoMove();
             let {up,down,left,right} = Config.snakes[index].direction.keydown;
             document.addEventListener('keydown',function(e){
@@ -246,19 +250,19 @@ function Controller(Config={
             id:null,
         };
         (function initSnake(){
-            let {score,body,length,head,direction,speed,active,id} = this._data;
+            let {score,body,length,head,direction,toDirection,speed,active,id} = this._data;
             while([...forbideen,null].indexOf(head)!==-1){
                 head=~~(Math.random()*1000%(cellNum*cellNum-2));
             }
             body.unshift(head);
             while(body.length!==length){
-                head=head+randomElement([-1,1,-cellNum]);
-                if(body.indexOf(head)===-1&&forbideen.indexOf(head)===-1){
-                    body.unshift(head);
+                let temp=head+randomElement([-1,1,-cellNum,cellNum]);
+                if(body.indexOf(temp)===-1&&forbideen.indexOf(temp)===-1){
+                    body.unshift(head=temp);
                 }
             };
             id=body.toString().split(',').join('');
-            this._data={score,body,length,head,direction,speed,active,id};
+            this._data={score,body,length,head,direction,toDirection,speed,active,id};
         }).bind(this)();
         function move(){
             let {score,body,length,head,direction,toDirection,speed,active,id} = this._data;
@@ -341,5 +345,6 @@ function Controller(Config={
         pause:pause,
         netController:this.netController,
         init:initController,
+        innerPixel:innerPixel,
     }
 }

@@ -29,14 +29,18 @@ function Controller(Config={
         //             'left':[65],
         //             'right':[68],
         //         }
-        //     }
+        //     },
+        //     scoreText:document.querySelector('#score2'),
         // }
     ],
     foods:[
         {
             color:'#FFD700',
         },
-    ]
+        {
+            color:'red',
+        },
+    ],//snakes与foods均有数量限制,不能超过10个
 }){
     let el=Config.el;
     let cellNum=Config.parameter.cellNum;
@@ -45,7 +49,7 @@ function Controller(Config={
             snakes:new Array(),//这是个snake实例的数组
             foods:new Array(),//这是个food实例的数组
             wall:new Array(),
-            pixels:new Array(cellNum*cellNum).fill(0),//0表示空，1表示蛇,2表示食物,3表示墙或障碍物
+            pixels:new Array(cellNum*cellNum).fill(0),//0表示空，10+表示蛇,20+表示食物,30表示墙或障碍物
             isPause:false,
         },
         config:{
@@ -56,7 +60,6 @@ function Controller(Config={
                 pixelBackGround:'snow',
                 snakesColor:[],
                 foodsColor:[],
-
             },
             text:{
                 button:{
@@ -67,9 +70,6 @@ function Controller(Config={
             parameter:Config.parameter,
         },
         draw:function(point,color){
-            // point 取值0-624
-            //  每行有25个格子
-            // 0-24 为第一行,以此类推
             let {box}=this.config;
             let {cellNum,size,edgeSize} = this.config.parameter;
 
@@ -77,9 +77,7 @@ function Controller(Config={
             box.fillRect((point%cellNum)*(size/cellNum)+1,(~~(point/cellNum))*(size/cellNum)+edgeSize,(size/cellNum)-2*edgeSize,(size/cellNum)-2*edgeSize);
         },
         render:function(){
-            //根据_data的值，再调用draw(),对canv进行更新，这需要是个setInterval，不管_data.isPause的值，每隔最短的一段时间执行
             setInterval(function(){
-                if(!this._data.isPause){
                     let {pixels}=this._data;
                     let {
                         canvasBackGround,
@@ -92,60 +90,63 @@ function Controller(Config={
                     canv.width=Config.parameter.size;
                     canv.height=Config.parameter.size;
                     pixels.forEach(function(value,index){
-                        // this.draw(value,pixelBackGround);
-                        switch(value){
-                            case 0:
-                                this.draw(index,pixelBackGround);
-                                break;
-                            case 1:
-                                this.draw(index,snakesColor[0]);
-                                break;
-                            // case 2:
-                            //     this.draw(index,snakesColor[1]);
-                            //     break;
-                            case 20:
-                                this.draw(index,foodsColor[0]);
-                                break;
-                            case 30:
-                                this.draw(index,'#CD8500');//这是墙    
+                        if(value===0){
+                            this.draw(index,pixelBackGround);
+                        }
+                        else if(value>29){
+                            this.draw(index,'#CD8500');//这是墙 
+                        }
+                        else if(value>19){
+                            this.draw(index,foodsColor[value-20]);
+                        }
+                        else if(value>9){
+                            this.draw(index,snakesColor[value-10])
                         }
                     }.bind(this));
                     Config.snakes.map(function(val,index){
                         val.scoreText.innerText='SCORE:'+this._data.snakes[index]._data.score;
                     }.bind(this));
-                };
             }.bind(this),1);
         },
         update:function(){
             //根据isPause的真假值，判断是否更新，若更新 ， setTimeOut，则根据遍历snake的move()，修改pixels,再根据food的position是否为null，createFood()
             setInterval(function(){
-                if(1){
-                    let {snakes,foods,wall,pixels,isPause} = this._data;
-                    pixels.fill(0);
+                let ojbk=true;
+                if(!this._data.isPause){
+                    let {snakes,foods,wall} = this._data;
+                    pixels=new Array().fill(0);
                     wall.map(function(val){
                         pixels[val]=30;
                     }.bind(this));
-                    foods.map(function(val){
-                        pixels[val.position]=20;
+                    foods.map(function(val,index){
+                        pixels[val.position]=20+index;
                     }.bind(this));
                     snakes.map(function(val,index){
                         if(pixels[val._data.head]===30){
                             this._data.isPause=true;
                             val._data.active=false;
                             val._data.body.map(function(value){
-                                pixels[value]=1+index;
+                                pixels[value]=10+index;
                             }.bind(this));
                             pixels[val._data.head]=30;
+                            Materialize.toast('HAHAH你输了,撞到墙了',2000);
+                            ojbk=false;
                         }
-                        else if(pixels[val._data.head]===20){
+                        else if(pixels[val._data.head]>19&&pixels[val._data.head]<30){
                             val._data.score++;
-                            this._data.foods[0].position=null;
-                            //对speed进行修改
+                            this._data.foods[pixels[val._data.head]-20].position=null;
+                            this._data.snakes[index]._data.speed *= 0.97 ;
+                            console.log(this._data.snakes[index]._data.speed);
                             val.getLonger();
+                            Materialize.toast(randomElement([
+                                '得分啦!',
+                                '加油鸭!',
+                                '太棒啦!',
+                            ]),2000);
                         }
                         else{
                             val._data.body.map(function(value){
-                                pixels[value]=1+index;
+                                pixels[value]=10+index;
                             }.bind(this));
                         }
                     }.bind(this));
@@ -153,9 +154,13 @@ function Controller(Config={
                         if(val._data.body.lastIndexOf(val._data.head)!==0){
                             this._data.isPause=true;
                             val._data.active=false;
+                            Materialize.toast('HAHAH你输了,撞到自己了',2000);
+                            ojbk=false;
                         }
                     }.bind(this));
-                    this._data.pixels=pixels;
+                    if(ojbk){
+                        this._data.pixels=pixels;
+                    }
                 }
             }.bind(this),1);
         },//需要在update函数中移动蛇，并进行判断
@@ -168,18 +173,22 @@ function Controller(Config={
             this.platform._data.snakes.push(new Snake([...this.platform._data.wall]));
             this.platform._data.snakes[index].autoMove();
             let {up,down,left,right} = Config.snakes[index].direction.keydown;
-            document.addEventListener('keyup',function(e){
+            document.addEventListener('keydown',function(e){
                 if(up.indexOf(e.keyCode)!==-1){
                     this.platform._data.snakes[index]._data.toDirection='up';
+                    e.returnValue=false;
                 }
                 else if(down.indexOf(e.keyCode)!==-1){
                     this.platform._data.snakes[index]._data.toDirection='down';
+                    e.returnValue=false;
                 }
                 else if(left.indexOf(e.keyCode)!==-1){
                     this.platform._data.snakes[index]._data.toDirection='left';
+                    e.returnValue=false;
                 }
                 else if(right.indexOf(e.keyCode)!==-1){
                     this.platform._data.snakes[index]._data.toDirection='right';
+                    e.returnValue=false;
                 }
             }.bind(this));
             this.platform.config.color.snakesColor.push(val.color);
@@ -318,6 +327,7 @@ function Controller(Config={
         document.addEventListener('keyup',function(e){
             if(e.keyCode===32){
                 this.pause();
+                e.returnValue=false;
             }
         }.bind(this));
         setTimeout(function(){

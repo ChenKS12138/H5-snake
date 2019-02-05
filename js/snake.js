@@ -17,7 +17,20 @@ function Controller(Config={
                     'right':[39],
                 },
             },
+            scoreText:document.querySelector('#score'),
         },
+        // {
+        //     color:'red',
+        //     direction:{
+        //         click:{},
+        //         keydown:{
+        //             'up':[87],
+        //             'down':[83],
+        //             'left':[65],
+        //             'right':[68],
+        //         }
+        //     }
+        // }
     ],
     foods:[
         {
@@ -33,7 +46,7 @@ function Controller(Config={
             foods:new Array(),//这是个food实例的数组
             wall:new Array(),
             pixels:new Array(cellNum*cellNum).fill(0),//0表示空，1表示蛇,2表示食物,3表示墙或障碍物
-            isPause:true,
+            isPause:false,
         },
         config:{
             canv:document.querySelector(el),
@@ -43,6 +56,7 @@ function Controller(Config={
                 pixelBackGround:'snow',
                 snakesColor:[],
                 foodsColor:[],
+
             },
             text:{
                 button:{
@@ -50,11 +64,6 @@ function Controller(Config={
                     stop:"STOP",
                 }
             },
-            // parameter:{
-            //     size:480,//canvas的宽度和长度
-            //     cellNum:20,//canvas 中一行的格子数
-            //     edgeSize:-0.0001,//格子间的缝的大小
-            // },
             parameter:Config.parameter,
         },
         draw:function(point,color){
@@ -70,77 +79,116 @@ function Controller(Config={
         render:function(){
             //根据_data的值，再调用draw(),对canv进行更新，这需要是个setInterval，不管_data.isPause的值，每隔最短的一段时间执行
             setInterval(function(){
-                let {pixels}=this._data;
-                let {
-                    canvasBackGround,
-                    pixelBackGround,
-                } = this.config.color;
-                let {canv}=this.config;
-                canv.style.backgroundColor=canvasBackGround;
-                pixels.forEach(function(value){
-                    this.draw(value,pixelBackGround);
-                }.bind(this))
+                if(!this._data.isPause){
+                    let {pixels}=this._data;
+                    let {
+                        canvasBackGround,
+                        pixelBackGround,
+                        snakesColor,
+                        foodsColor,
+                    } = this.config.color;
+                    let {canv}=this.config;
+                    canv.style.backgroundColor=canvasBackGround;
+                    canv.width=Config.parameter.size;
+                    canv.height=Config.parameter.size;
+                    pixels.forEach(function(value,index){
+                        // this.draw(value,pixelBackGround);
+                        switch(value){
+                            case 0:
+                                this.draw(index,pixelBackGround);
+                                break;
+                            case 1:
+                                this.draw(index,snakesColor[0]);
+                                break;
+                            // case 2:
+                            //     this.draw(index,snakesColor[1]);
+                            //     break;
+                            case 20:
+                                this.draw(index,foodsColor[0]);
+                                break;
+                            case 30:
+                                this.draw(index,'#CD8500');//这是墙    
+                        }
+                    }.bind(this));
+                    Config.snakes.map(function(val,index){
+                        val.scoreText.innerText='SCORE:'+this._data.snakes[index]._data.score;
+                    }.bind(this));
+                };
             }.bind(this),1);
         },
         update:function(){
             //根据isPause的真假值，判断是否更新，若更新 ， setTimeOut，则根据遍历snake的move()，修改pixels,再根据food的position是否为null，createFood()
             setInterval(function(){
-                if(!this._data.isPause){
+                if(1){
                     let {snakes,foods,wall,pixels,isPause} = this._data;
-                    snakes.map(function(val){
-                        val.body.map(function(value){
-                            pixels[value]=1;
-                        });
-                    });
-                    foods.map(function(val){
-                        pixels[val.position]=2;
-                    });
+                    pixels.fill(0);
                     wall.map(function(val){
-                        pixels[val]=3;
-                    });
-                    this._data.pixels=pixels;
+                        pixels[val]=30;
+                    }.bind(this));
+                    foods.map(function(val){
+                        pixels[val.position]=20;
+                    }.bind(this));
                     snakes.map(function(val,index){
-                        val.move();
-                        if(pixels[val._data.head]===3){
+                        if(pixels[val._data.head]===30){
                             this._data.isPause=true;
-                            val._data.alive=false;
+                            val._data.active=false;
+                            val._data.body.map(function(value){
+                                pixels[value]=1+index;
+                            }.bind(this));
+                            pixels[val._data.head]=30;
                         }
-                        else if(pixels[val._data.head]===2){
+                        else if(pixels[val._data.head]===20){
                             val._data.score++;
+                            this._data.foods[0].position=null;
                             //对speed进行修改
+                            val.getLonger();
                         }
-                    });
+                        else{
+                            val._data.body.map(function(value){
+                                pixels[value]=1+index;
+                            }.bind(this));
+                        }
+                    }.bind(this));
+                    snakes.map(function(val,index){
+                        if(val._data.body.lastIndexOf(val._data.head)!==0){
+                            this._data.isPause=true;
+                            val._data.active=false;
+                        }
+                    }.bind(this));
+                    this._data.pixels=pixels;
                 }
             }.bind(this),1);
         },//需要在update函数中移动蛇，并进行判断
     };
     (function initData(){
         Config.snakes.map(function(val,index){
-            this.platform._data.snakes.push(new Snake());
+            for(let j=0;j<cellNum-1;j++){
+                this.platform._data.wall.push(j,cellNum*(j+1)-1,cellNum*(j+1),cellNum*(cellNum-1)+j+1);
+            }
+            this.platform._data.snakes.push(new Snake([...this.platform._data.wall]));
+            this.platform._data.snakes[index].autoMove();
             let {up,down,left,right} = Config.snakes[index].direction.keydown;
             document.addEventListener('keyup',function(e){
-                if(up.indexOf(e.keyCode!==-1)){
-                    this.platform._data.snakes[index].direction='up';
+                if(up.indexOf(e.keyCode)!==-1){
+                    this.platform._data.snakes[index]._data.toDirection='up';
                 }
                 else if(down.indexOf(e.keyCode)!==-1){
-                    this.platform._data.snakes[index].direction='donw';
+                    this.platform._data.snakes[index]._data.toDirection='down';
                 }
                 else if(left.indexOf(e.keyCode)!==-1){
-                    this.platform._data.snakes[index].direction='left';
+                    this.platform._data.snakes[index]._data.toDirection='left';
                 }
                 else if(right.indexOf(e.keyCode)!==-1){
-                    this.platform._data.snakes[index].direction='right';
+                    this.platform._data.snakes[index]._data.toDirection='right';
                 }
-            }.bind(this))
+            }.bind(this));
             this.platform.config.color.snakesColor.push(val.color);
         }.bind(this));
-        Config.foods.map(function(val){
-            this.platform._data.foods.push(new Food());
+        Config.foods.map(function(val,index){
+            this.platform._data.foods.push(new Food([...this.platform._data.wall]));
+            this.platform._data.foods[index].init();
             this.platform.config.color.foodsColor.push(val.color);
         }.bind(this));
-        for(let j=0;j<cellNum-1;j++){
-            this.platform._data.wall.push(j,cellNum*(j+1)-1,cellNum*(j+1),cellNum*(cellNum-1)+j+1);
-        }
     }).bind(this)();
     this.netController={
         //负责网络部分
@@ -151,21 +199,26 @@ function Controller(Config={
     function pause(){
         //调整platform._data.isPause;
         this.platform._data.isPause=!this.platform._data.isPause;
+        this.platform._data.snakes.map(function(val){
+            val._data.active=!val._data.active;
+        }.bind(this))
+        return this.platform._data.isPause;
     };
-    function Food(){
+    function Food(forbidden=[]){
         this.position=null;
-        let init=function(){
+        function init(){
             setInterval(function createFood(forbidden){
                 if(this.position===null||this.position===undefined){
                     let randPosition=null;
-                    while(forbidden.indexOf(randPosition)!==-1){
-                        randPosition=(~~(Math.random()*1000)%(cellNum*cellNum-2));;
+                    while([...this.forbidden,null].indexOf(randPosition)!==-1){
+                        randPosition=(~~(Math.random()*1000)%(cellNum*cellNum-2));
                     }
                     this.position=randPosition;
                 }
             }.bind(this),1);
         }
         return{
+            forbidden:forbidden,
             position:this.position,
             init:init,
         }
@@ -175,30 +228,55 @@ function Controller(Config={
         this._data={
             score:0,
             body:new Array(),
-            length:2,//暂时设定为只能为2,后期再修改
+            length:3,
             head:null,
-            direction:null,//可能的值为'up','down','left','right'
-            speed:1000,
-            alive:true,
+            direction:'up',//可能的值为'up','down','left','right'
+            toDirection:'up',
+            speed:100,
+            active:true,
             id:null,
         };
         (function initSnake(){
-            let {score,body,length,head,direction,speed,alive,id} = this._data;
-            head=~~(Math.random()*1000%(cellNum*cellNum-2));
+            let {score,body,length,head,direction,speed,active,id} = this._data;
+            while([...forbideen,null].indexOf(head)!==-1){
+                head=~~(Math.random()*1000%(cellNum*cellNum-2));
+            }
             body.unshift(head);
             while(body.length!==length){
-                head=head+randomElement([-1,1,cellNum,-cellNum]);
-                if(body.indexOf(head)===-1){
+                head=head+randomElement([-1,1,-cellNum]);
+                if(body.indexOf(head)===-1&&forbideen.indexOf(head)===-1){
                     body.unshift(head);
                 }
             };
             id=body.toString().split(',').join('');
-            this._data={score,body,length,head,direction,speed,alive,id};
+            this._data={score,body,length,head,direction,speed,active,id};
         }).bind(this)();
         function move(){
-            let {body,length,head,direction} = this._data;
+            let {score,body,length,head,direction,toDirection,speed,active,id} = this._data;
+            switch(toDirection){
+                case 'up':
+                    if(direction!=='down'){
+                        direction=toDirection;
+                    }
+                    break;
+                case 'down':
+                    if(direction!=='up'){
+                        direction=toDirection;
+                    }
+                    break;
+                case 'left':
+                    if(direction!=='right'){
+                        direction=toDirection;
+                    }
+                    break;
+                case 'right':
+                    if(direction!=='left'){
+                        direction=toDirection;
+                    }
+                    break;
+            }
             body.pop();
-            let cellNum=config.parameter.cellNum;
+            let cellNum=Config.parameter.cellNum;
             head=body[0];
             switch(direction){
                 case 'up':
@@ -214,23 +292,37 @@ function Controller(Config={
                     body.unshift(head += 1);
                     break;
             }
-            this._data={body,length,head,direction};
+            this._data={score,body,length,head,direction,toDirection,speed,active,id};
         }
         function autoMove(){
             let t=setTimeout(function(){
-                move();
+                if(this._data.active){
+                    this.move();
+                }
                 t=setTimeout(autoMove.bind(this),this._data.speed);
             }.bind(this),this._data.speed);
+        }
+        function getLonger(){
+            this._data.body.push(this._data.body[this._data.body.length-1]);
         }
         return {
             move:move,
             _data:this._data,
             autoMove:autoMove,
+            getLonger:getLonger,
         }
     };
     function initController(){
         this.platform.update();
         this.platform.render();
+        document.addEventListener('keyup',function(e){
+            if(e.keyCode===32){
+                this.pause();
+            }
+        }.bind(this));
+        setTimeout(function(){
+            this.pause();
+        }.bind(this),20)
     }
     return{
         //返回一个类

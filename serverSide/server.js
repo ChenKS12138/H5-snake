@@ -117,7 +117,13 @@ app.use('/',function(req,res){
 })
 let server=app.listen(8080);
 
-
+setInterval(function manageCache (){
+    cache.forEach(function(value,index){
+        if(value!==undefined&&(time() - parseInt(value.timeStamp) > 5000)){
+            cache.splice(index,1);
+        }
+    }.bind(this));
+},1);
 
 // cache=[
 //     {

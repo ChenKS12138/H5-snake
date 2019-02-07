@@ -44,6 +44,7 @@ function Controller(Config={
 }){
     let el=Config.el;
     let cellNum=Config.parameter.cellNum;
+
     this.platform={
         _data:{
             snakes:new Array(),//这是个snake实例的数组
@@ -164,13 +165,82 @@ function Controller(Config={
             }.bind(this),1);
         },//需要在update函数中移动蛇，并进行判断
     };
-    function innerPixel(width,offset=0){
-        let res=new Array();
-        for(let j=0;j<width-1-offset*2;j++){
-            res.push(j+offset*(width+1),(width*(j+1)-1)*(offset+1),width*(j+1+offset)+offset,width*(width-1-offset)+j+1+offset);
+
+    this.netController={
+        //负责网络部分
+        _data:{
+            work:true,
+            status:200,//约定 200为服务器端有该房间且有对手的信息，201为又该房间但是没有对手信息，202为找不到该房间
+            sendData:{},
+            rid:{}//此处的rid需要用户自行生成，
+        },
+        serverPath:'http://127.0.0.1:8080',
+        bindData:function(){
+            setInterval(function(){
+                let {score,body,length,head,direction,toDirection,speed,active,id} =this.platform._data.snakes[0]._data;
+                let color=this.platform.config.color.snakesColor[0];
+                let foods=this.platform._data.foods.map(function(val){return val.position});
+                let foodsColor=this.platform.config.color.foodsColor;
+                this.netController._data.sendData={
+                    score:score,
+                    body:body,
+                    head:head,
+                    direction:direction,
+                    toDirection:toDirection,
+                    speed:speed,
+                    active:active,
+                    id:id,
+                    color:color,
+                    foods:foods,
+                    foodsColor:foodsColor,
+                };
+            }.bind(this),1);
+        }.bind(this),
+        connect:function(rid=null){
+            let postBody={
+                rid:233,
+                score:0,
+                body:new Array(),
+                length:3,
+                head:null,
+                direction:'up',//可能的值为'up','down','left','right'
+                toDirection:'up',
+                speed:100,
+                active:true,
+                id:null,
+                color:'red',
+                foods:[],
+                foodsColor:['red']
+            };
+            if(this._data.work){
+                $.post(this.serverPath,{rid:33},function(data,status){
+                    console.log(data,status);
+                    this.checkData(data);
+                    this.connect();
+                }.bind(this));
+            }
+        },
+        checkData:function(data){
+            if(data.ret===200){
+                data=data.data;
+                this.platform.config.foodsColor=data.foodsColor;
+                this.platform._data.snakes.forEach(function(val,index){
+                    if(val.id===data.snake.id){
+                        this.platform._data.snakes[index]._data=data.snake;
+                        this.platform.config.snakesColor[index]=data.snakeColor;
+                    }
+                }.bind(this));
+                this.platform._data.foods=this.platform._data.foods.map(function(val,index){
+                    val.position=data.foods[index];
+                    return val;
+                }.bind(this));
+            }
+            else{
+                console.log('wait');
+            }
         }
-        return res;
-    }
+    };
+
     (function initData(){
         Config.snakes.map(function(val,index){
             this.platform._data.wall.push(...innerPixel(cellNum));
@@ -203,41 +273,13 @@ function Controller(Config={
             this.platform.config.color.foodsColor.push(val.color);
         }.bind(this));
     }).bind(this)();
-    this.netController={
-        //负责网络部分
-        _data:{
-            work:true,
-            status:200,//约定 200为服务器端有该房间且有对手的信息，201为又该房间但是没有对手信息，202为找不到该房间
-
-        },
-        serverPath:'http://127.0.0.1:8080',
-        connect:function(){
-            $.post(this.serverPath,{rid:44},function(data,status){
-                console.log(data,status);
-                this.checkData(data);
-                this.connect();
-            }.bind(this));
-        },
-        checkData:function(data){
-            if(data.ret===200){
-                data=data.data;
-                this.platform.config.foodsColor=data.foodsColor;
-                this.platform._data.snakes.forEach(function(val,index){
-                    if(val.id===data.snake.id){
-                        this.platform._data.snakes[index]._data=data.snake;
-                        this.platform.config.snakesColor[index]=data.snakeColor;
-                    }
-                }.bind(this));
-                this.platform._data.foods=this.platform._data.foods.map(function(val,index){
-                    val.position=data.foods[index];
-                    return val;
-                }.bind(this));
-            }
-            else{
-                console.log('wait');
-            }
+    function innerPixel(width,offset=0){
+        let res=new Array();
+        for(let j=0;j<width-1-offset*2;j++){
+            res.push(j+offset*(width+1),(width*(j+1)-1)*(offset+1),width*(j+1+offset)+offset,width*(width-1-offset)+j+1+offset);
         }
-    };
+        return res;
+    }
     function randomElement(arr){
         return arr[~~(Math.random()*10%arr.length)];
     }
@@ -293,7 +335,8 @@ function Controller(Config={
                     body.unshift(head=temp);
                 }
             };
-            id=body.toString().split(',').join('');
+            // id=body.toString().split(',').join('');
+            id=Math.random().toString(36).substr(2);
             this._data={score,body,length,head,direction,toDirection,speed,active,id};
         }).bind(this)();
         function move(){
@@ -361,6 +404,7 @@ function Controller(Config={
         this.platform.update();
         this.platform.render();
         this.netController.connect();
+        this.netController.bindData();
         document.addEventListener('keyup',function(e){
             if(e.keyCode===32){
                 this.pause();

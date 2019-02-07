@@ -14,50 +14,20 @@ app.all('*', function(req, res, next) {
     res.header("Access-Control-Allow-Origin", "*");
     res.header("Access-Control-Allow-Headers", "X-Requested-With");
     res.header("Access-Control-Allow-Methods","PUT,POST,GET,DELETE,OPTIONS");
-    res.header("X-Powered-By",' 3.2.1')
+    res.header("X-Powered-By",' 3.2.1');
     res.header("Content-Type", "application/json;charset=utf-8");
     next();
 });
 
 
 app.use('/',function(req,res){
-    if(req.body!=={}&&req.body.rid!==null&&req.body.rid!==undefined&&cache.length!==0){
-        cache.forEach(function(val,index,arr){
-            if(req.body.rid===val.rid){
-                val.players.forEach(function(value,ind,array){
-                    if(value.id===req.body.id){
-                        let temp={
-                                score:req.body.score,
-                                body:req.body.body,
-                                length:req.body.length,
-                                head:req.body.head,
-                                direction:req.body.direction,//可能的值为'up','down','left','right'
-                                toDirection:req.body.toDirection,
-                                speed:req.body.speed,
-                                active:req.body.active,
-                                id:req.body.id,
-                            };
-                        cache[index].players[ind]=temp;
-                        cache[index].snakeColor[ind]=req.body.color;
-                        cache[index].timeStamp=time();
-                        res.json({
-                            ret:200,//成功找到房间，并成功找到自己,成功将服务器端的数据刷新
-                            data:cache[index],
-                        });
-                    }
-                    else{
-                        if(ind+1===array.length){
-                             res.json({
-                                 ret:203,//尚未找到队友
-                                 data:cache[index],
-                             });
-                        }
-                    }
-                }.bind(this));
-            }
-            else{
-                if(index+1===array.length){
-                    cache[index].players.push({
+    if(req.body!=={}&&req.body.rid!==null&&req.body.rid!==undefined){
+        if(cache.length===0){
+            cache.push({
+                rid:req.body.rid,
+                timeStamp:time(),
+                players:[
+                    {
                         score:req.body.score,
                         body:req.body.body,
                         length:req.body.length,
@@ -67,21 +37,16 @@ app.use('/',function(req,res){
                         speed:req.body.speed,
                         active:req.body.active,
                         id:req.body.id,
-                    })
-                    cache[index].snakeColor.push(req.body.color);
-                    res.json({
-                        ret:201,//未找到自己
-                    })
-                }
-            }
-        }.bind(this));
-    }
-    else{
-        cache.push({
-            rid:req.body.rid,
-            timeStamp:time(),
-            players:[
-                {
+                    }
+                ],
+                snakeColor:req.body.color,
+                foods:req.body.foods,
+                foodsColor:req.body.foodsColor,
+            });
+        }
+        cache.forEach(function(val,index,arr){
+            if(req.body.rid===val.rid){
+                let temp={
                     score:req.body.score,
                     body:req.body.body,
                     length:req.body.length,
@@ -91,12 +56,60 @@ app.use('/',function(req,res){
                     speed:req.body.speed,
                     active:req.body.active,
                     id:req.body.id,
+                };
+                let snakeIndex=val.players.map(function(val){return val.id}).indexOf(req.body.id);
+                if(snakeIndex===-1){
+                    cache[index].players.push(temp);
+                    cache[index].snakeColor.push(req.body.color);
+                    cache[index].timeStamp=time();
+                    cache[index].foods=req.body.foods;
+                    cache[index].foodsColor=req.body.foodsColor;
+                     res.json({
+                         ret:205,
+                     });
                 }
-            ],
-            snakeColor:req.body.color,
-            foods:req.body.foods,
-            foodsColor:req.body.foodsColor,
-        })
+                else{
+                    cache[index].players[snakeIndex]=temp;
+                    cache[index].snakeColor[snakeIndex]=req.body.color;
+                    cache[index].timeStamp=time();
+                    cache[index].foods=req.body.foods;
+                    cache[index].foodsColor=req.body.foodsColor;
+                     res.json({
+                         ret:206,
+                     });
+                }
+            }
+            else{
+                if(index+1===array.length){
+                    cache.push({
+                        rid:req.body.rid,
+                        timeStamp:time(),
+                        players:[
+                            {
+                                score:req.body.score,
+                                body:req.body.body,
+                                length:req.body.length,
+                                head:req.body.head,
+                                direction:req.body.direction,//可能的值为'up','down','left','right'
+                                toDirection:req.body.toDirection,
+                                speed:req.body.speed,
+                                active:req.body.active,
+                                id:req.body.id,
+                            }
+                        ],
+                        snakeColor:req.body.color,
+                        foods:req.body.foods,
+                        foodsColor:req.body.foodsColor,
+                    });
+                    cache[index].snakeColor.push(req.body.color);
+                    res.json({
+                        ret:201,
+                    });
+                }
+            }
+        }.bind(this));
+    }
+    else{
         res.json({
             ret:202,//参数补全或参数非法  rid不正确
         })

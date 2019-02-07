@@ -1,49 +1,60 @@
-let controller1=new Controller({
-    snackColor:"#008B00",
-    foodColor:"#FFD700",
-},true);
-let controller2=new Controller({
-    snackColor:"#6E8B3D",
-    foodColor:"#CD8500",
-},true);
-controller1.setCompetitorController(controller2);
-controller2.setCompetitorController(controller1);
-(function main(){
-    document.addEventListener('keydown',function(e){
-        switch(e.keyCode){
-            case 87:
-                controller1.direction('up');
-                break;
-            case 83:
-                controller1.direction('down');
-                break;
-            case 65:
-                controller1.direction('left');
-                break;
-            case 68:
-                controller1.direction('right');
-                break;
-            case 37:
-                controller2.direction('left');
-                break;
-            case 38:
-                controller2.direction('up');
-                break;
-            case 39:
-                controller2.direction('right');
-                break;
-            case 40:
-                controller2.direction('down');
-                break;
-            case 80:
-            case 32:
-            case 13:
-                controller1.pause();
-                controller2.pause();
-                e.returnValue=false;
-                break;
-            case 82:
-                window.location.reload();
+let controller=new Controller({
+    el:'#canv',
+    parameter:{
+        size:480,
+        cellNum:20,
+        edgeSize:-0.0001
+    },
+    snakes:[
+        {
+            color:'#008B00',
+            direction:{
+                click:{},
+                keydown:{
+                    'up':[38],
+                    'down':[40],
+                    'left':[37],
+                    'right':[39],
+                },
+            },
+            scoreText:document.querySelector('#score1'),
+        },
+        {
+            color:'brown',
+            direction:{
+                click:{},
+                keydown:{
+                    'up':[87],
+                    'down':[83],
+                    'left':[65],
+                    'right':[68],
+                }
+            },
+            scoreText:document.querySelector('#score2'),
         }
-    })
-})()
+    ],
+    foods:[
+        {
+            color:'#FFD700',
+        },
+        // {
+        //     color:'red',
+        // },
+    ],//snakes与foods均有数量限制,不能超过10个
+    online:false,
+});
+controller.init();
+document.querySelector('#reset-button').addEventListener('click',function(){
+    location.reload();
+})
+let pause=document.querySelector('#sp-button').addEventListener('click',function(){
+    controller.pause();
+}.bind(this));
+setInterval(function(){
+    if(controller.platform._data.isPause===true){
+        document.querySelector('#sp-text').innerHTML='CONTINUE';
+    }
+    else{
+        document.querySelector('#sp-text').innerHTML='PAUSE';
+    }
+}.bind(this),1)

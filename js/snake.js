@@ -41,6 +41,7 @@ function Controller(Config={
             color:'red',
         },
     ],//snakes与foods均有数量限制,不能超过10个
+    online:false,
 }){
     let el=Config.el;
     let cellNum=Config.parameter.cellNum;
@@ -62,12 +63,12 @@ function Controller(Config={
                 snakesColor:[],
                 foodsColor:[],
             },
-            text:{
-                button:{
-                    continue:"CONTINUE",
-                    stop:"STOP",
-                }
-            },
+            // text:{
+            //     button:{
+            //         continue:"CONTINUE",
+            //         stop:"STOP",
+            //     }
+            // },
             parameter:Config.parameter,
         },
         draw:function(point,color){
@@ -272,6 +273,8 @@ function Controller(Config={
             this.platform._data.foods[index].init();
             this.platform.config.color.foodsColor.push(val.color);
         }.bind(this));
+        
+        this.netController._data.work=Config.online;
     }).bind(this)();
     function innerPixel(width,offset=0){
         let res=new Array();

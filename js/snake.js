@@ -205,6 +205,33 @@ function Controller(Config={
     }).bind(this)();
     this.netController={
         //负责网络部分
+        serverPath:'http://127.0.0.1:8080',
+        connect:function(){
+            $.post(this.serverPath,{},function(data,status){
+                console.log(data,status);
+                // this.checkData(data);
+                this.connect();
+            }.bind(this));
+        },
+        checkData:function(data){
+            if(ret===200){
+                data=data.data;
+                this.platform.config.foodsColor=data.foodsColor;
+                this.platform._data.snakes.forEach(function(val,index){
+                    if(val.id===data.snake.id){
+                        this.platform._data.snakes[index]._data=data.snake;
+                        this.platform.config.snakesColor[index]=data.snakeColor;
+                    }
+                }.bind(this));
+                this.platform._data.foods=this.platform._data.foods.map(function(val,index){
+                    val.position=data.foods[index];
+                    return val;
+                }.bind(this));
+            }
+            else{
+                console.log('wait');
+            }
+        }
     };
     function randomElement(arr){
         return arr[~~(Math.random()*10%arr.length)];
@@ -328,6 +355,7 @@ function Controller(Config={
     function initController(){
         this.platform.update();
         this.platform.render();
+        this.netController.connect();
         document.addEventListener('keyup',function(e){
             if(e.keyCode===32){
                 this.pause();

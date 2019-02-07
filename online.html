@@ -26,24 +26,27 @@
             <a href="#" class="brand-logo title">SNAKE</a>
             <a href="#" data-activates="mobile-demo" class="button-collapse"><i class="material-icons">menu</i></a>
             <ul id="nav-mobile" class="right hide-on-med-and-down">
-            <li><a href="#">主页</a></li>
-            <li><a href="#">多人模式</a></li>
-            <li><a href="#">排行榜</a></li>
+            <li><a href="./index.html">主页</a></li>
+            <li><a href="./mutiplayer.html">多人模式</a></li>
+            <li><a href="./online.html">在线模式</a></li>
             <li><a href="#">Q&A</a></li>
             <li><a href="#">关于我</a></li>
             </ul>
             <ul class="side-nav" id="mobile-demo">
-            <li><a href="#">主页</a></li>
-            <li><a href="#">多人模式</a></li>
-            <li><a href="#">排行榜</a></li>
+            <li><a href="./index.html">主页</a></li>
+            <li><a href="./mutiplayer.html">多人模式</a></li>
+            <li><a href="./online.html">在线模式</a></li>
             <li><a href="#">Q&A</a></li>
             <li><a href="#">关于我</a></li>
             </ul>
         </div>
     </nav>
-    <p id="score">SCORE:</p>
-    <p id="score2"></p>
-    <canvas id='canv'>您的浏览器版本过低,推荐是使用最新版的Chrome浏览器</canvas>
+    <div class="scores">
+        <p id="score1" class="score">SCORE:</p>
+        <p id="score2" class="score"></p>
+    </div>
+    <!-- <canvas id='canv'>您的浏览器版本过低,推荐是使用最新版的Chrome浏览器</canvas> -->
+    <h1>开发中，敬请期待</h1>
     <div class="main">
         <div class="direction hide-on-med-and-up">
             <div>
@@ -73,7 +76,7 @@
         </div>
     </div>
     <script src="./js/snake.js"></script>
-    <script src="./js/index.js"></script>
+    <script src="./js/mutiplayer.js"></script>
     <script>
             $(".button-collapse").sideNav();
     </script>

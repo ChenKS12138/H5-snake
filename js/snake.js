@@ -202,7 +202,7 @@ function Controller(Config={
                 rid:233,
                 score:0,
                 body:new Array(),
-                length:3,
+                length:2,
                 head:null,
                 direction:'up',//可能的值为'up','down','left','right'
                 toDirection:'up',
@@ -318,7 +318,7 @@ function Controller(Config={
         this._data={
             score:0,
             body:new Array(),
-            length:3,
+            length:2,
             head:null,
             direction:'up',//可能的值为'up','down','left','right'
             toDirection:'up',
@@ -342,6 +342,7 @@ function Controller(Config={
             id=Math.random().toString(36).substr(2);
             this._data={score,body,length,head,direction,toDirection,speed,active,id};
         }).bind(this)();
+        //TODO 这边的生成随机蛇有BUG，暂时的解决方案是减小初始长度，后期再改
         function move(){
             let {score,body,length,head,direction,toDirection,speed,active,id} = this._data;
             switch(toDirection){

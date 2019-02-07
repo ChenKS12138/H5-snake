@@ -205,16 +205,21 @@ function Controller(Config={
     }).bind(this)();
     this.netController={
         //负责网络部分
+        _data:{
+            work:true,
+            status:200,//约定 200为服务器端有该房间且有对手的信息，201为又该房间但是没有对手信息，202为找不到该房间
+
+        },
         serverPath:'http://127.0.0.1:8080',
         connect:function(){
-            $.post(this.serverPath,{},function(data,status){
+            $.post(this.serverPath,{rid:44},function(data,status){
                 console.log(data,status);
-                // this.checkData(data);
+                this.checkData(data);
                 this.connect();
             }.bind(this));
         },
         checkData:function(data){
-            if(ret===200){
+            if(data.ret===200){
                 data=data.data;
                 this.platform.config.foodsColor=data.foodsColor;
                 this.platform._data.snakes.forEach(function(val,index){

@@ -1,7 +1,13 @@
 const express=require('express');
 const bodyParser=require('body-parser');
 const app=express();
+
 let cache=[];
+let time=function(){
+    let date=new Date();
+    return date.getTime();
+}
+
 app.use(bodyParser.urlencoded({extended:true}));
 app.use(bodyParser.json());
 app.all('*', function(req, res, next) {
@@ -15,7 +21,7 @@ app.all('*', function(req, res, next) {
 
 
 app.use('/',function(req,res){
-    if(req.body!=={}&&req.body.rid!=null&&req.body.rid!==undefined){
+    if(req.body!=={}&&req.body.rid!==null&&req.body.rid!==undefined&&cache.length!==0){
         cache.forEach(function(val,index,arr){
             if(req.body.rid===val.rid){
                 val.players.forEach(function(value,ind,array){
@@ -30,20 +36,39 @@ app.use('/',function(req,res){
                                 speed:req.body.speed,
                                 active:req.body.active,
                                 id:req.body.id,
-                                color:req.body.color,
                             };
                         cache[index].players[ind]=temp;
-                        let date=new Date();
-                        cache[index].timeStamp=date.getTime();
+                        cache[index].snakeColor[ind]=req.body.color;
+                        cache[index].timeStamp=time();
                         res.json({
-                            ret:200,//成功找到房间，并成功找到自己
+                            ret:200,//成功找到房间，并成功找到自己,成功将服务器端的数据刷新
                             data:cache[index],
                         });
+                    }
+                    else{
+                        if(ind+1===array.length){
+                             res.json({
+                                 ret:203,//尚未找到队友
+                                 data:cache[index],
+                             });
+                        }
                     }
                 }.bind(this));
             }
             else{
                 if(index+1===array.length){
+                    cache[index].players.push({
+                        score:req.body.score,
+                        body:req.body.body,
+                        length:req.body.length,
+                        head:req.body.head,
+                        direction:req.body.direction,//可能的值为'up','down','left','right'
+                        toDirection:req.body.toDirection,
+                        speed:req.body.speed,
+                        active:req.body.active,
+                        id:req.body.id,
+                    })
+                    cache[index].snakeColor.push(req.body.color);
                     res.json({
                         ret:201,//未找到自己
                     })
@@ -52,11 +77,29 @@ app.use('/',function(req,res){
         }.bind(this));
     }
     else{
-        if(index+1===arr.length){
-            res.json({
-                ret:202,//未找到匹配的房间
-            })
-        }
+        cache.push({
+            rid:req.body.rid,
+            timeStamp:time(),
+            players:[
+                {
+                    score:req.body.score,
+                    body:req.body.body,
+                    length:req.body.length,
+                    head:req.body.head,
+                    direction:req.body.direction,//可能的值为'up','down','left','right'
+                    toDirection:req.body.toDirection,
+                    speed:req.body.speed,
+                    active:req.body.active,
+                    id:req.body.id,
+                }
+            ],
+            snakeColor:req.body.color,
+            foods:req.body.foods,
+            foodsColor:req.body.foodsColor,
+        })
+        res.json({
+            ret:202,//参数补全或参数非法  rid不正确
+        })
     }
 })
 let server=app.listen(8080);
@@ -110,6 +153,7 @@ let server=app.listen(8080);
 //     id:null,
 //     color:'red',
 //     foods:[],
+//     foodsColor:['red']
 // }
 
 

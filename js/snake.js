@@ -171,9 +171,9 @@ function Controller(Config={
         //负责网络部分
         _data:{
             work:true,
-            status:200,//约定 200为服务器端有该房间且有对手的信息，201为又该房间但是没有对手信息，202为找不到该房间
+            status:200,//约定 200为服务器端有该房间且有对手的信息，201为进入房间尚无对手，202为未进入房间
             sendData:{},
-            rid:{}//此处的rid需要用户自行生成，
+            rid:null//此处的rid需要用户自行生成，
         },
         serverPath:'http://127.0.0.1:8080',
         bindData:function(){
@@ -197,28 +197,15 @@ function Controller(Config={
                 };
             }.bind(this),1);
         }.bind(this),
-        connect:function(rid=null){
-            let postBody={
-                rid:233,
-                score:0,
-                body:new Array(),
-                length:2,
-                head:null,
-                direction:'up',//可能的值为'up','down','left','right'
-                toDirection:'up',
-                speed:100,
-                active:true,
-                id:null,
-                color:'red',
-                foods:[],
-                foodsColor:['red']
-            };
+        connect:function(){
             if(this._data.work){
-                $.post(this.serverPath,{rid:33},function(data,status){
-                    console.log(data,status);
+                this._data.sendData.rid=this._data.rid;
+                $.post(this.serverPath,this._data.sendData,function(data,status){
+                    // console.log(data,status);
                     this.checkData(data);
                     this.connect();
                 }.bind(this));
+                // console.log(this._data.sendData);
             }
         },
         checkData:function(data){

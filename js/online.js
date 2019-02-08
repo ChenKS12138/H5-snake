@@ -17,21 +17,21 @@ let controller=new Controller({
                     'right':[39],
                 },
             },
-            scoreText:document.querySelector('#score'),
+            scoreText:document.querySelector('#score1'),
         },
-        {
-            color:'brown',
-            direction:{
-                click:{},
-                keydown:{
-                    'up':[87],
-                    'down':[83],
-                    'left':[65],
-                    'right':[68],
-                }
-            },
-            scoreText:document.querySelector('#score2'),
-        }
+        // {
+        //     color:'brown',
+        //     direction:{
+        //         click:{},
+        //         keydown:{
+        //             'up':[87],
+        //             'down':[83],
+        //             'left':[65],
+        //             'right':[68],
+        //         }
+        //     },
+        //     scoreText:document.querySelector('#score2'),
+        // }
     ],
     foods:[
         {

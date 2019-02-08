@@ -65,7 +65,7 @@ app.use('/',function(req,res){
                     cache[index].foods=req.body.foods;
                     cache[index].foodsColor=req.body.foodsColor;
                      res.json({
-                         ret:205,
+                         ret:205,//在该房间下新建了一个玩家
                      });
                 }
                 else{
@@ -77,11 +77,11 @@ app.use('/',function(req,res){
                      res.json({
                          ret:206,
                      });
-                }
+                }//否则修改对应id的玩家的信息
             }
-            else{
+            else{//如果真的找不到这个房间
                 if(index+1===array.length){
-                    cache.push({
+                    cache.push({//就来新建一个房间
                         rid:req.body.rid,
                         timeStamp:time(),
                         players:[
@@ -119,7 +119,7 @@ let server=app.listen(8080);
 
 setInterval(function manageCache (){
     cache.forEach(function(value,index){
-        if(value!==undefined&&(time() - parseInt(value.timeStamp) > 5000)){
+        if(value!==undefined&&(time() - parseInt(value.timeStamp) > 5000)&&value.players.length===2){
             cache.splice(index,1);
         }
     }.bind(this));

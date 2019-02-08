@@ -131,7 +131,7 @@ function Controller(Config={
                                 pixels[value]=10+index;
                             }.bind(this));
                             pixels[val._data.head]=30;
-                            Materialize.toast('HAHAH你输了,撞到墙了',2000);
+                            Materialize.toast('HAHAH游戏结束,撞到墙了',2000);
                             ojbk=false;
                         }
                         else if(pixels[val._data.head]>19&&pixels[val._data.head]<30){
@@ -155,7 +155,7 @@ function Controller(Config={
                         if(val._data.body.lastIndexOf(val._data.head)!==0){
                             this._data.isPause=true;
                             val._data.active=false;
-                            Materialize.toast('HAHAH你输了,撞到自己了',2000);
+                            Materialize.toast('HAHAH游戏结束,撞到自己了',2000);
                             ojbk=false;
                         }
                     }.bind(this));
@@ -171,7 +171,7 @@ function Controller(Config={
         //负责网络部分
         _data:{
             work:true,
-            status:200,//约定 200为服务器端有该房间且有对手的信息，201为进入房间尚无对手，202为未进入房间
+            status:202,//约定 200为服务器端有该房间且有对手的信息，201为进入房间尚无对手，202为未进入房间
             sendData:{},
             rid:null//此处的rid需要用户自行生成，
         },
@@ -188,6 +188,7 @@ function Controller(Config={
                     head:head,
                     direction:direction,
                     toDirection:toDirection,
+                    length:length,
                     speed:speed,
                     active:active,
                     id:id,
@@ -195,38 +196,53 @@ function Controller(Config={
                     foods:foods,
                     foodsColor:foodsColor,
                 };
+                this.netController._data.sendData.rid=this.netController._data.rid;
+                if(this.netController._data.status===206||this.netController._data.status===205){
+                    // this.pause();
+                }
             }.bind(this),1);
         }.bind(this),
         connect:function(){
             if(this._data.work){
-                this._data.sendData.rid=this._data.rid;
                 $.post(this.serverPath,this._data.sendData,function(data,status){
-                    // console.log(data,status);
-                    this.checkData(data);
-                    this.connect();
+                    this._data.status=data.ret;
+                    if(data.ret===202){
+                        Materialize.toast('参数非法',2000);
+                    }
+                    else if(data.ret===208){
+                        Materialize.toast('该房间已满',2000);
+                    }
+                    else if(data.ret===201||data.ret===207){
+                        Materialize.toast('成功加入该房间',2000);
+                    }
+                    else if(data.ret===206||data.ret===205){
+                        this.checkData(data.data);
+                    }
+                    setTimeout(function(){
+                        this.connect();
+                    }.bind(this),90);
                 }.bind(this));
-                // console.log(this._data.sendData);
             }
         },
         checkData:function(data){
-            if(data.ret===200){
-                data=data.data;
+            if(data){
                 this.platform.config.foodsColor=data.foodsColor;
-                this.platform._data.snakes.forEach(function(val,index){
-                    if(val.id===data.snake.id){
-                        this.platform._data.snakes[index]._data=data.snake;
-                        this.platform.config.snakesColor[index]=data.snakeColor;
-                    }
-                }.bind(this));
                 this.platform._data.foods=this.platform._data.foods.map(function(val,index){
                     val.position=data.foods[index];
                     return val;
                 }.bind(this));
+                // this.platform._data.snakes.forEach(function(val,index){
+                //     data.players.forEach(function(snake,ind){
+                //         if(snake.id==val.id){
+                //             val=snake;
+                //             this.platform.config.snakesColor[index]=data.snakesColor[ind];
+                //         }
+                //     }.bind(this));
+                // }.bind(this));
+                this.platform._data.snakes[1]._data=data.snake;
+                this.platform.config.color.snakesColor[1]=data.snakeColor;
             }
-            else{
-                console.log('wait');
-            }
-        }
+        }.bind(this),
     };
 
     (function initData(){

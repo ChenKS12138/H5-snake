@@ -19,19 +19,19 @@ let controller=new Controller({
             },
             scoreText:document.querySelector('#score1'),
         },
-        // {
-        //     color:'brown',
-        //     direction:{
-        //         click:{},
-        //         keydown:{
-        //             'up':[87],
-        //             'down':[83],
-        //             'left':[65],
-        //             'right':[68],
-        //         }
-        //     },
-        //     scoreText:document.querySelector('#score2'),
-        // }
+        {
+            color:'brown',
+            direction:{
+                click:{},
+                keydown:{
+                    'up':[87],
+                    'down':[83],
+                    'left':[65],
+                    'right':[68],
+                }
+            },
+            scoreText:document.querySelector('#score2'),
+        }
     ],
     foods:[
         {
@@ -57,4 +57,11 @@ setInterval(function(){
     else{
         document.querySelector('#sp-text').innerHTML='PAUSE';
     }
-}.bind(this),1)
+}.bind(this),1);
+setTimeout(function(){
+    while(!controller.netController._data.rid){
+        let rid=prompt('请输入房间的ID');
+        controller.netController._data.rid=rid;
+        controller.netController.connect();
+    }
+}.bind(this),100)

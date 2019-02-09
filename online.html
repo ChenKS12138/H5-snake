@@ -41,39 +41,47 @@
             </ul>
         </div>
     </nav>
-    <div class="scores">
-        <p id="score1" class="score">SCORE:</p>
-        <p id="score2" class="score"></p>
+    <div class="core">
+        <div class="scores">
+            <p id="score1" class="score">SCORE:</p>
+            <p id="score2" class="score"></p>
+        </div>
+        <canvas id='canv'>您的浏览器版本过低,推荐是使用最新版的Chrome浏览器</canvas>
+        <div class="main">
+            <div class="direction hide-on-med-and-up">
+                <div>
+                    <div id="up">
+                        <p class="button-name">UP</p>
+                    </div>
+                    <div id="right">
+                        <p class="button-name">RIGHT</p>
+                    </div>
+                </div>
+                <div>
+                    <div id="left">
+                        <p class="button-name">LEFT</p>
+                    </div>
+                    <div id="down">
+                        <p class="button-name">DOWN</p>
+                    </div>
+                </div>
+            </div>
+            <div class="controller">
+                <div id='sp-button'>
+                    <p id="sp-text">NULL</p>
+                </div>
+                <div id='reset-button'>
+                    <p id="reset-text">RESET</p>
+                </div>
+            </div>
+        </div>
     </div>
-    <canvas id='canv'>您的浏览器版本过低,推荐是使用最新版的Chrome浏览器</canvas>
-    <h1 id="tip"></h1>
-    <div class="main">
-        <div class="direction hide-on-med-and-up">
-            <div>
-                <div id="up">
-                    <p class="button-name">UP</p>
-                </div>
-                <div id="right">
-                    <p class="button-name">RIGHT</p>
-                </div>
-            </div>
-            <div>
-                <div id="left">
-                    <p class="button-name">LEFT</p>
-                </div>
-                <div id="down">
-                    <p class="button-name">DOWN</p>
-                </div>
-            </div>
-        </div>
-        <div class="controller">
-            <div id='sp-button'>
-                <p id="sp-text">NULL</p>
-            </div>
-            <div id='reset-button'>
-                <p id="reset-text">RESET</p>
-            </div>
-        </div>
+    <div class="input-field" id="tip">
+        <h2 id="tipText"></h2>
+        <input type="text" id="key" class="validate">
+        <button class="btn waves-effect waves-light orange darken-4" type="submit" id="submit">提交
+            <i class="material-icons right">send</i>
+        </button>
     </div>
     <script src="./js/snake.js"></script>
     <script src="./js/online.js"></script>

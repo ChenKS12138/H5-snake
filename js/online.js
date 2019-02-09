@@ -58,10 +58,20 @@ setInterval(function(){
         document.querySelector('#sp-text').innerHTML='PAUSE';
     }
 }.bind(this),1);
-setTimeout(function(){
-    while(!controller.netController._data.rid){
-        let rid=prompt('请输入房间的ID');
-        controller.netController._data.rid=rid;
-        controller.netController.connect();
+let tipText=document.querySelector('#tipText');
+setInterval(function(){
+    switch(controller.netController._data.status){
+        case 203:
+            tipText.innerHTML="请输入RID";
+            break;
+        case 201:
+            tipText.innerHTML="正在等待好友加入房间 .......";
+            break;
+        case 202:
+            tipText.innerHTML="正在进入房间 ........";
+            break;
+        default:
+            tipText.innerHTML="";
+            break;
     }
-}.bind(this),100)
+}.bind(this),90);

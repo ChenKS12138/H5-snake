@@ -171,7 +171,7 @@ function Controller(Config={
         //负责网络部分
         _data:{
             work:true,
-            status:202,//约定 200为服务器端有该房间且有对手的信息，201为进入房间尚无对手，202为未进入房间
+            status:203,//约定 200为服务器端有该房间且有对手的信息，201为进入房间尚无对手，202为未进入房间,203为为输入rid
             sendData:{},
             rid:null//此处的rid需要用户自行生成，
         },
@@ -197,31 +197,42 @@ function Controller(Config={
                     foodsColor:foodsColor,
                 };
                 this.netController._data.sendData.rid=this.netController._data.rid;
-                if(this.netController._data.status===206||this.netController._data.status===205){
-                    // this.pause();
+                if(this.netController._data.rid!==null){
+                    this.netController._data.status=202;
                 }
             }.bind(this),1);
         }.bind(this),
         connect:function(){
             if(this._data.work){
-                $.post(this.serverPath,this._data.sendData,function(data,status){
-                    this._data.status=data.ret;
-                    if(data.ret===202){
-                        Materialize.toast('参数非法',2000);
-                    }
-                    else if(data.ret===208){
-                        Materialize.toast('该房间已满',2000);
-                    }
-                    else if(data.ret===201||data.ret===207){
-                        Materialize.toast('成功加入该房间',2000);
-                    }
-                    else if(data.ret===206||data.ret===205){
-                        this.checkData(data.data);
-                    }
+                if(this._data.status!==203){
+                    $.post(this.serverPath,this._data.sendData,function(data,status){
+                        this._data.status=data.ret;
+                        if(data.ret===202){
+                            Materialize.toast('参数非法',2000);
+                            this._data.status=202;
+                        }
+                        else if(data.ret===208){
+                            Materialize.toast('该房间已满',2000);
+                            this._data.status=202;
+                        }
+                        else if(data.ret===201||data.ret===207){
+                            Materialize.toast('成功加入该房间',2000);
+                            this._data.status=201;
+                        }
+                        else if(data.ret===206||data.ret===205){
+                            this.checkData(data.data);
+                            this._data.status=200;
+                        }
+                        setTimeout(function(){
+                            this.connect();
+                        }.bind(this),90);
+                    }.bind(this));
+                }
+                else{
                     setTimeout(function(){
                         this.connect();
                     }.bind(this),90);
-                }.bind(this));
+                }
             }
         },
         checkData:function(data){

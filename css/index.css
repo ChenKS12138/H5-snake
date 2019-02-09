@@ -3,13 +3,20 @@
     margin: 0;
     -webkit-tap-highlight-color: transparent;
 }
-body{
+body,.core{
     background-color: NavajoWhite;
     text-align: center;
     display: flex;
     flex-direction: column;
     align-items: center;
     user-select: none;
+}
+.core{
+    margin-top: 1rem;
+    display: none;
+}
+#tip{
+    margin-top: 2rem;
 }
 .title{
     margin-left: -50px;

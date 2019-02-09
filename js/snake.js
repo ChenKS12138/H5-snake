@@ -106,7 +106,7 @@ function Controller(Config={
                         }
                     }.bind(this));
                     Config.snakes.map(function(val,index){
-                        val.scoreText.innerText='SCORE:'+this._data.snakes[index]._data.score;
+                        // val.scoreText.innerText='SCORE:'+this._data.snakes[index]._data.score;
                     }.bind(this));
             }.bind(this),1);
         },
@@ -114,7 +114,7 @@ function Controller(Config={
             //根据isPause的真假值，判断是否更新，若更新 ， setTimeOut，则根据遍历snake的move()，修改pixels,再根据food的position是否为null，createFood()
             setInterval(function(){
                 let ojbk=true;
-                if(!this._data.isPause){
+                // if(!this._data.isPause){
                     let {snakes,foods,wall} = this._data;
                     pixels=new Array().fill(0);
                     wall.map(function(val){
@@ -131,7 +131,7 @@ function Controller(Config={
                                 pixels[value]=10+index;
                             }.bind(this));
                             pixels[val._data.head]=30;
-                            Materialize.toast('HAHAH游戏结束,撞到墙了',2000);
+                            // Materialize.toast('HAHAH游戏结束,撞到墙了',2000);
                             ojbk=false;
                         }
                         else if(pixels[val._data.head]>19&&pixels[val._data.head]<30){
@@ -155,14 +155,14 @@ function Controller(Config={
                         if(val._data.body.lastIndexOf(val._data.head)!==0){
                             this._data.isPause=true;
                             val._data.active=false;
-                            Materialize.toast('HAHAH游戏结束,撞到自己了',2000);
+                            // Materialize.toast('HAHAH游戏结束,撞到自己了',2000);
                             ojbk=false;
                         }
                     }.bind(this));
                     if(ojbk){
                         this._data.pixels=pixels;
                     }
-                }
+                // }
             }.bind(this),1);
         },//需要在update函数中移动蛇，并进行判断
     };
@@ -171,7 +171,7 @@ function Controller(Config={
         //负责网络部分
         _data:{
             work:true,
-            status:203,//约定 200为服务器端有该房间且有对手的信息，201为进入房间尚无对手，202为未进入房间,203为为输入rid
+            status:204,//约定 200为服务器端有该房间且有对手的信息，201 参数错误   202 房间只有一个人 203 房间已满 204 为为输入rid
             sendData:{},
             rid:null//此处的rid需要用户自行生成，
         },
@@ -204,22 +204,22 @@ function Controller(Config={
         }.bind(this),
         connect:function(){
             if(this._data.work){
-                if(this._data.status!==203){
+                if(this._data.status!==204){
                     $.post(this.serverPath,this._data.sendData,function(data,status){
                         this._data.status=data.ret;
-                        if(data.ret===202){
+                        if(data.ret===201){
                             Materialize.toast('参数非法',2000);
-                            this._data.status=202;
-                        }
-                        else if(data.ret===208){
-                            Materialize.toast('该房间已满',2000);
-                            this._data.status=202;
-                        }
-                        else if(data.ret===201||data.ret===207){
-                            Materialize.toast('成功加入该房间',2000);
                             this._data.status=201;
                         }
-                        else if(data.ret===206||data.ret===205){
+                        else if(data.ret===203){
+                            Materialize.toast('该房间已满',2000);
+                            this._data.status=203;
+                        }
+                        else if(data.ret===202){
+                            Materialize.toast('房间只有一人，等待好友加入中',2000);
+                            this._data.status=202;
+                        }
+                        else if(data.ret===200){
                             this.checkData(data.data);
                             this._data.status=200;
                         }
@@ -242,14 +242,6 @@ function Controller(Config={
                     val.position=data.foods[index];
                     return val;
                 }.bind(this));
-                // this.platform._data.snakes.forEach(function(val,index){
-                //     data.players.forEach(function(snake,ind){
-                //         if(snake.id==val.id){
-                //             val=snake;
-                //             this.platform.config.snakesColor[index]=data.snakesColor[ind];
-                //         }
-                //     }.bind(this));
-                // }.bind(this));
                 this.platform._data.snakes[1]._data=data.snake;
                 this.platform.config.color.snakesColor[1]=data.snakeColor;
             }
@@ -260,7 +252,14 @@ function Controller(Config={
         Config.snakes.map(function(val,index){
             this.platform._data.wall.push(...innerPixel(cellNum));
             this.platform._data.snakes.push(new Snake([...this.platform._data.wall,...innerPixel(cellNum,1)]));
-            this.platform._data.snakes[index].autoMove();
+            if(!Config.online){
+                this.platform._data.snakes[index].autoMove();
+            }
+            else{
+                if(!index){
+                    this.platform._data.snakes[index].autoMove();
+                }
+            }
             let {up,down,left,right} = Config.snakes[index].direction.keydown;
             document.addEventListener('keydown',function(e){
                 if(up.indexOf(e.keyCode)!==-1){
@@ -423,7 +422,7 @@ function Controller(Config={
         this.platform.render();
         this.netController.connect();
         this.netController.bindData();
-        document.addEventListener('keyup',function(e){
+        document.addEventListener('keydown',function(e){
             if(e.keyCode===32){
                 this.pause();
                 e.returnValue=false;

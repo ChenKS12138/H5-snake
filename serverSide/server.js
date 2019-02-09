@@ -19,131 +19,95 @@ app.all('*', function(req, res, next) {
     next();
 });
 
-//约定如下
-//此处的贪吃蛇联网模式一个房间只能有两个玩家
-//当client只需发送rid，其自身的snake信息，以及该房间的foods信息
-//server应向client发送其对手的snake信息，以及房间的foos信息
+//ret 200房间正常有两个人  201 参数错误   202 房间只有一个人 203 房间已满
 
 app.use('/',function(req,res){
-    console.log(cache);
-    if(req.body!=={}&&req.body.rid!==null&&req.body.rid!==undefined){//检验参数是否合法
+    if(req.body!=={}&&req.body.rid!==null&&req.body.rid!==undefined){
+        let tempSnake={
+            score:req.body.score,
+            body:req.body.body,
+            length:req.body.length,
+            head:req.body.head,
+            direction:req.body.direction,//可能的值为'up','down','left','right'
+            toDirection:req.body.toDirection,
+            speed:req.body.speed,
+            active:req.body.active,
+            id:req.body.id,
+        };
+        let rid=req.body.rid;
+        let color=req.body.color;
+        let foods=req.body.foods;
+        let foodsColor=req.body.foodsColor;
         if(cache.length===0){
             cache.push({
-                rid:req.body.rid,
+                rid:rid,
                 timeStamp:time(),
-                players:[
-                    {
-                        score:req.body.score,
-                        body:req.body.body,
-                        length:req.body.length,
-                        head:req.body.head,
-                        direction:req.body.direction,//可能的值为'up','down','left','right'
-                        toDirection:req.body.toDirection,
-                        speed:req.body.speed,
-                        active:req.body.active,
-                        id:req.body.id,
-                    }
-                ],
-                snakeColor:[req.body.color],
-                foods:req.body.foods,
-                foodsColor:req.body.foodsColor,
+                players:[tempSnake],
+                snakesColor:[color],
+                foods:foods,
+                foodsColor:foodsColor,
             });
         }
-        cache.forEach(function(val,index,arr){
-            if(req.body.rid===val.rid){
-                if(val.players.length<3){
-                    let temp={
-                        score:req.body.score,
-                        body:req.body.body,
-                        length:req.body.length,
-                        head:req.body.head,
-                        direction:req.body.direction,//可能的值为'up','down','left','right'
-                        toDirection:req.body.toDirection,
-                        speed:req.body.speed,
-                        active:req.body.active,
-                        id:req.body.id,
-                    };
-                    let snakeIndex=val.players.map(function(value){return value.id}).indexOf(req.body.id);
-                    if(snakeIndex===-1){
-                        cache[index].players.push(temp);
-                        cache[index].snakeColor.push(req.body.snakeColor);
-                        cache[index].timeStamp=time();
-                        cache[index].foods=req.body.foods;
-                        cache[index].foodsColor=req.body.foodsColor;
-                        if(val.players.length!==2){
-                            res.json({
-                                ret:205,//在该房间下新建了一个玩家，这样就有两个玩家了
-                                data:{
-                                    snake:cache[index].players[0],
-                                    snakeColor:cache[index].snakeColor[0],
-                                    foods:cache[index].foods,
-                                    foodsColor:cache[index].foodsColor,
-                                },
-                            });
-                        }
-                        else{
-                            res.json({
-                                ret:207,//自己刚加入房间，就一个人
-                                data:{},
-                            })
-                        }
-                    }
-                    else{
-                        cache[index].players[snakeIndex]=temp;
-                        cache[index].snakeColor[snakeIndex]=req.body.color;
-                        cache[index].timeStamp=time();
-                        cache[index].foods=req.body.foods;
-                        cache[index].foodsColor=req.body.foodsColor;
-                            res.json({
-                                ret:206,//否则修改对应id的玩家的信息
-                                data:{
-                                    snake:cache[index].players[1-snakeIndex],
-                                    snakeColor:cache[index].snakeColor[1-snakeIndex],
-                                    foods:cache[index].foods,
-                                    foodsColor:cache[index].foodsColor,
-                                },
-                            });
-                    }
-                }
-                else{
-                    res.json({
-                        ret:208,//报错房间已满
-                    });
-                }
+        let ridList=cache.map(function(val){ return val.rid});
+        let ridIndex=ridList.indexOf(rid);
+        if(ridIndex!==-1){
+            let idList=cache[ridIndex].players.map(function(val,index){return val.id}.bind(this));
+            let idIndex = idList.indexOf(tempSnake.id);
+            if(idIndex!==-1){
+                cache[ridIndex].players[idIndex]=tempSnake;
+                cache[ridIndex].snakesColor[idIndex]=color;
+                cache[ridIndex].foods=foods;
+                cache[ridIndex].foodsColor=foodsColor;
             }
-            else{//如果真的找不到这个房间
-                if(index+1===arr.length){
-                    cache.push({//就来新建一个房间
-                        rid:req.body.rid,
-                        timeStamp:time(),
-                        players:[
-                            {
-                                score:req.body.score,
-                                body:req.body.body,
-                                length:req.body.length,
-                                head:req.body.head,
-                                direction:req.body.direction,//可能的值为'up','down','left','right'
-                                toDirection:req.body.toDirection,
-                                speed:req.body.speed,
-                                active:req.body.active,
-                                id:req.body.id,
-                            }
-                        ],
-                        snakeColor:[req.body.color],
-                        foods:req.body.foods,
-                        foodsColor:[req.body.foodsColor],
-                    });
-                    cache[index].snakeColor.push(req.body.color);
-                    res.json({
-                        ret:201,//刚刚创建一个房间，就一个人
-                    });
-                }
+            else if(cache[ridIndex].players.length <= 2){
+                cache[ridIndex].players.push(tempSnake);
+                cache[ridIndex].snakesColor.push(color);
+                cache[ridIndex].foods=foods;
+                cache[ridIndex].foodsColor=foodsColor;
             }
-        }.bind(this));
+            if(cache[ridIndex].players.length!==2){
+                res.json({
+                    ret:202,
+                    data:null,
+                });
+            }
+            else{
+                res.json({
+                    ret:200,
+                    data:{
+                        snake:cache[ridIndex].players[1-idIndex],
+                        snakesColor:cache[ridIndex].snakesColor[1-idIndex],
+                        foods:cache[ridIndex].foods,
+                        foodsColor:cache[ridIndex].foodsColor,
+                    },
+                });
+                console.log({
+                    snake:cache[ridIndex].players[1-idIndex],
+                    snakesColor:cache[ridIndex].snakesColor[1-idIndex],
+                    foods:cache[ridIndex].foods,
+                    foodsColor:cache[ridIndex].foodsColor,
+                });
+            }
+        }
+        else{
+            cache.push({
+                rid:rid,
+                timeStamp:time(),
+                players:[tempSnake],
+                snakesColor:[color],
+                foods:foods,
+                foodsColor:foodsColor,
+            });
+            res.json({
+                ret:202,
+                data:null,
+            });
+        }
+        
     }
     else{
         res.json({
-            ret:202,//参数补全或参数非法  rid不正确
+            ret:201,//参数补全或参数非法  rid不正确
         })
     }
 })

@@ -61,17 +61,26 @@ setInterval(function(){
 let tipText=document.querySelector('#tipText');
 setInterval(function(){
     switch(controller.netController._data.status){
-        case 203:
+        case 204:
             tipText.innerHTML="请输入RID";
             break;
-        case 201:
+        case 202:
             tipText.innerHTML="正在等待好友加入房间 .......";
             break;
-        case 202:
-            tipText.innerHTML="正在进入房间 ........";
+        case 203:
+            tipText.innerHTML="该房间已满";
+            break;
+        case 201:
+            tipText.innerHTML="参数错误";
             break;
         default:
             tipText.innerHTML="";
+            document.querySelector('.core').style="display:block";
+            document.querySelector('#tip').style="display:none";
+            // controller.pause();
             break;
     }
 }.bind(this),90);
+document.querySelector('#submit').addEventListener('click',function(){
+    controller.netController._data.rid=document.querySelector('#key').value; 
+}.bind(this));

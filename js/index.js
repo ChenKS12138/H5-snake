@@ -37,9 +37,9 @@ let controller=new Controller({
         {
             color:'#FFD700',
         },
-        // {
-        //     color:'red',
-        // },
+        {
+            color:'red',
+        },
     ],//snakes与foods均有数量限制,不能超过10个
     online:false,
 });

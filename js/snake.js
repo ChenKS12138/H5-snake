@@ -60,8 +60,8 @@ function Controller(Config={
             color:{
                 canvasBackGround:'snow',
                 pixelBackGround:'snow',
-                snakesColor:[],
-                foodsColor:[],
+                // snakesColor:[],
+                // foodsColor:[],
             },
             // text:{
             //     button:{
@@ -84,9 +84,9 @@ function Controller(Config={
                     let {
                         canvasBackGround,
                         pixelBackGround,
-                        snakesColor,
-                        foodsColor,
                     } = this.config.color;
+                    snakesColor=this._data.snakes.map(function(val){return val._data.color});
+                    foodsColor=this._data.foods.map(function(val){return val.color});
                     let {canv}=this.config;
                     canv.style.backgroundColor=canvasBackGround;
                     canv.width=Config.parameter.size;
@@ -102,11 +102,11 @@ function Controller(Config={
                             this.draw(index,foodsColor[value-20]);
                         }
                         else if(value>9){
-                            this.draw(index,snakesColor[value-10])
+                            this.draw(index,snakesColor[value-10]);
                         }
                     }.bind(this));
                     Config.snakes.map(function(val,index){
-                        // val.scoreText.innerText='SCORE:'+this._data.snakes[index]._data.score;
+                        val.scoreText.innerText='SCORE:'+this._data.snakes[index]._data.score;
                     }.bind(this));
             }.bind(this),1);
         },
@@ -178,10 +178,9 @@ function Controller(Config={
         serverPath:'http://127.0.0.1:8080',
         bindData:function(){
             setInterval(function(){
-                let {score,body,length,head,direction,toDirection,speed,active,id} =this.platform._data.snakes[0]._data;
-                let color=this.platform.config.color.snakesColor[0];
+                let {score,body,length,head,direction,toDirection,speed,active,id,color} =this.platform._data.snakes[0]._data;
                 let foods=this.platform._data.foods.map(function(val){return val.position});
-                let foodsColor=this.platform.config.color.foodsColor;
+                let foodsColor=this.platform._data.foods.map(function(val){return val.color});
                 this.netController._data.sendData={
                     score:score,
                     body:body,
@@ -237,13 +236,17 @@ function Controller(Config={
         },
         checkData:function(data){
             if(data){
-                this.platform.config.foodsColor=data.foodsColor;
+                // this.platform.config.foodsColor=data.foodsColor;
                 this.platform._data.foods=this.platform._data.foods.map(function(val,index){
                     val.position=data.foods[index];
                     return val;
                 }.bind(this));
+                this.platform._data.foods=this.platform._data.foods.map(function(val,index){
+                    val.color=data.foodsColor[index];
+                    return val;
+                }.bind(this));
                 this.platform._data.snakes[1]._data=data.snake;
-                this.platform.config.color.snakesColor[1]=data.snakeColor;
+                // this.platform._data.snake[1]._data.color=data.snakeColor;
             }
         }.bind(this),
     };
@@ -251,7 +254,7 @@ function Controller(Config={
     (function initData(){
         Config.snakes.map(function(val,index){
             this.platform._data.wall.push(...innerPixel(cellNum));
-            this.platform._data.snakes.push(new Snake([...this.platform._data.wall,...innerPixel(cellNum,1)]));
+            this.platform._data.snakes.push(new Snake([...this.platform._data.wall,...innerPixel(cellNum,1)],Config.snakes[index].color));
             if(!Config.online){
                 this.platform._data.snakes[index].autoMove();
             }
@@ -279,12 +282,12 @@ function Controller(Config={
                     e.returnValue=false;
                 }
             }.bind(this));
-            this.platform.config.color.snakesColor.push(val.color);
+            // this.platform.config.color.snakesColor.push(val.color);
         }.bind(this));
         Config.foods.map(function(val,index){
-            this.platform._data.foods.push(new Food([...this.platform._data.wall]));
+            this.platform._data.foods.push(new Food([...this.platform._data.wall],Config.foods[index].color));
             this.platform._data.foods[index].init();
-            this.platform.config.color.foodsColor.push(val.color);
+            // this.platform.config.color.foodsColor.push(val.color);
         }.bind(this));
         
         this.netController._data.work=Config.online;
@@ -307,8 +310,9 @@ function Controller(Config={
         }.bind(this))
         return this.platform._data.isPause;
     };
-    function Food(forbidden=[]){
+    function Food(forbidden=[],color=null){
         this.position=null;
+        this.color=color;
         function init(){
             setInterval(function createFood(forbidden){
                 if(this.position===null||this.position===undefined){
@@ -324,9 +328,10 @@ function Controller(Config={
             forbidden:forbidden,
             position:this.position,
             init:init,
+            color:this.color,
         }
     };
-    function Snake(forbideen=new Array()){
+    function Snake(forbideen=new Array(),snakeColor=null){
         //返回一个Snake类
         this._data={
             score:0,
@@ -338,9 +343,11 @@ function Controller(Config={
             speed:100,
             active:true,
             id:null,
+            color:null,
         };
         (function initSnake(){
-            let {score,body,length,head,direction,toDirection,speed,active,id} = this._data;
+            this._data.color=snakeColor;
+            let {score,body,length,head,direction,toDirection,speed,active,id,color} = this._data;
             while([...forbideen,null].indexOf(head)!==-1){
                 head=~~(Math.random()*1000%(cellNum*cellNum-2));
             }
@@ -353,11 +360,11 @@ function Controller(Config={
             };
             // id=body.toString().split(',').join('');
             id=Math.random().toString(36).substr(2);
-            this._data={score,body,length,head,direction,toDirection,speed,active,id};
+            this._data={score,body,length,head,direction,toDirection,speed,active,id,color};
         }).bind(this)();
         //TODO 这边的生成随机蛇有BUG，暂时的解决方案是减小初始长度，后期再改
         function move(){
-            let {score,body,length,head,direction,toDirection,speed,active,id} = this._data;
+            let {score,body,length,head,direction,toDirection,speed,active,id,color} = this._data;
             switch(toDirection){
                 case 'up':
                     if(direction!=='down'){
@@ -397,7 +404,7 @@ function Controller(Config={
                     body.unshift(head += 1);
                     break;
             }
-            this._data={score,body,length,head,direction,toDirection,speed,active,id};
+            this._data={score,body,length,head,direction,toDirection,speed,active,id,color};
         }
         function autoMove(){
             let t=setTimeout(function(){

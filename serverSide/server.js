@@ -33,9 +33,9 @@ app.use('/',function(req,res){
             speed:req.body.speed,
             active:req.body.active,
             id:req.body.id,
+            color:req.body.color,
         };
         let rid=req.body.rid;
-        let color=req.body.color;
         let foods=req.body.foods;
         let foodsColor=req.body.foodsColor;
         if(cache.length===0){
@@ -43,7 +43,6 @@ app.use('/',function(req,res){
                 rid:rid,
                 timeStamp:time(),
                 players:[tempSnake],
-                snakesColor:[color],
                 foods:foods,
                 foodsColor:foodsColor,
             });
@@ -55,15 +54,17 @@ app.use('/',function(req,res){
             let idIndex = idList.indexOf(tempSnake.id);
             if(idIndex!==-1){
                 cache[ridIndex].players[idIndex]=tempSnake;
-                cache[ridIndex].snakesColor[idIndex]=color;
-                cache[ridIndex].foods=foods;
-                cache[ridIndex].foodsColor=foodsColor;
+                if(cache[ridIndex].players.length===1){                    
+                    cache[ridIndex].foods=foods;
+                    cache[ridIndex].foodsColor=foodsColor;
+                }
             }
             else if(cache[ridIndex].players.length <= 2){
                 cache[ridIndex].players.push(tempSnake);
-                cache[ridIndex].snakesColor.push(color);
-                cache[ridIndex].foods=foods;
-                cache[ridIndex].foodsColor=foodsColor;
+                if(cache[ridIndex].players.length===1){
+                    cache[ridIndex].foods=foods;
+                    cache[ridIndex].foodsColor=foodsColor;
+                }
             }
             if(cache[ridIndex].players.length!==2){
                 res.json({
@@ -76,17 +77,11 @@ app.use('/',function(req,res){
                     ret:200,
                     data:{
                         snake:cache[ridIndex].players[1-idIndex],
-                        snakesColor:cache[ridIndex].snakesColor[1-idIndex],
                         foods:cache[ridIndex].foods,
                         foodsColor:cache[ridIndex].foodsColor,
                     },
                 });
-                console.log({
-                    snake:cache[ridIndex].players[1-idIndex],
-                    snakesColor:cache[ridIndex].snakesColor[1-idIndex],
-                    foods:cache[ridIndex].foods,
-                    foodsColor:cache[ridIndex].foodsColor,
-                });
+                console.log(cache);
             }
         }
         else{
@@ -94,7 +89,6 @@ app.use('/',function(req,res){
                 rid:rid,
                 timeStamp:time(),
                 players:[tempSnake],
-                snakesColor:[color],
                 foods:foods,
                 foodsColor:foodsColor,
             });
@@ -136,6 +130,7 @@ let server=app.listen(8080);
 //                 speed:100,
 //                 active:true,
 //                 id:null,
+//                 color:'red',
 //             },
 //             {
 //                 score:0,
@@ -147,9 +142,9 @@ let server=app.listen(8080);
 //                 speed:100,
 //                 active:true,
 //                 id:null,
+//                 color:'red',
 //             },
 //         ],
-//         snakesColor:['red','red']
 //         foods:[23],
 //         foodSColor:['red'],
 //     }

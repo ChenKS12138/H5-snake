@@ -449,3 +449,17 @@ function Controller(Config={
         innerPixel:innerPixel,
     }
 }
+
+let test={ snake:
+    { score: '0',
+      body: [ '289', '290' ],
+      length: '2',
+      head: '289',
+      direction: 'up',
+      toDirection: 'up',
+      speed: '100',
+      active: 'false',
+      id: 'yzi37fuppzq',
+      color: '#008B00' },
+   foods: [ '375', '68' ],
+   foodsColor: [ '#FFD700', 'red' ] }

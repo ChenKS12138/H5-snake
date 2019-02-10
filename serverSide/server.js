@@ -7,6 +7,16 @@ let time=function(){
     let date=new Date();
     return date.getTime();
 }
+function partiallyIdentical(arr1,arr2){
+    let sum=[...arr1,...arr2];
+    let res=0;
+    sum.map(function(val,index,arr){
+        if(arr.lastIndexOf(val)!==index){
+            res=1;
+        }
+    }.bind(this));
+    return res;
+}
 
 app.use(bodyParser.urlencoded({extended:true}));
 app.use(bodyParser.json());
@@ -54,14 +64,14 @@ app.use('/',function(req,res){
             let idIndex = idList.indexOf(tempSnake.id);
             if(idIndex!==-1){
                 cache[ridIndex].players[idIndex]=tempSnake;
-                if(cache[ridIndex].players.length===1){                    
+                if(partiallyIdentical(cache[ridIndex].foods,foods)){                    
                     cache[ridIndex].foods=foods;
                     cache[ridIndex].foodsColor=foodsColor;
                 }
             }
             else if(cache[ridIndex].players.length <= 2){
                 cache[ridIndex].players.push(tempSnake);
-                if(cache[ridIndex].players.length===1){
+                if(partiallyIdentical(cache[ridIndex].foods,foods)){
                     cache[ridIndex].foods=foods;
                     cache[ridIndex].foodsColor=foodsColor;
                 }
@@ -114,6 +124,11 @@ let server=app.listen(8080);
 //         }
 //     }.bind(this));
 // },1);
+
+
+
+
+
 
 // cache=[
 //     {

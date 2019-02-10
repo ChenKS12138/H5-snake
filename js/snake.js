@@ -187,7 +187,8 @@ function Controller(Config={
             sendData:{},
             rid:null//此处的rid需要用户自行生成，
         },
-        serverPath:'http://47.106.250.72:8080',
+        // serverPath:'http://47.106.250.72:8080',
+        serverPath:'http://127.0.0.1:8080',
         bindData:function(){
             setInterval(function(){
                 let {score,body,length,head,direction,toDirection,speed,active,id,color} =this.platform._data.snakes[0]._data;

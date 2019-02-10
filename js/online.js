@@ -78,19 +78,19 @@ setInterval(function(){
             tipText.innerHTML="";
             document.querySelector('.core').style="display:block";
             document.querySelector('#tip').style="display:none";
-            // if(lastStatus!==200){
-            //     setTimeout(function(){
-            //         Materialize.toast('3',500,'',function(){
-            //             Materialize.toast('2',500,'',function(){
-            //                 Materialize.toast('1',500,'',function(){
-            //                     Materialize.toast('开始',500,'',function(){
-            //                         controller.pause();
-            //                     });
-            //                 });
-            //             });
-            //         });
-            //     }.bind(this),300);
-            // };
+            if(lastStatus!==200){
+                setTimeout(function(){
+                    Materialize.toast('3',500,'',function(){
+                        Materialize.toast('2',500,'',function(){
+                            Materialize.toast('1',500,'',function(){
+                                Materialize.toast('开始',500,'',function(){
+                                    controller.pause();
+                                });
+                            });
+                        });
+                    });
+                }.bind(this),300);
+            };
             //TODO 发行版记得把上面注释的代码恢复
             break;
     }

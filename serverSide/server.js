@@ -63,15 +63,17 @@ app.use('/',function(req,res){
             let idList=cache[ridIndex].players.map(function(val,index){return val.id}.bind(this));
             let idIndex = idList.indexOf(tempSnake.id);
             if(idIndex!==-1){
+                cache[ridIndex].timeStamp=time();
                 cache[ridIndex].players[idIndex]=tempSnake;
-                if(partiallyIdentical(cache[ridIndex].foods,foods)){                    
+                if(partiallyIdentical(cache[ridIndex].foods,foods)&&foods.indexOf('-1')===-1){                    
                     cache[ridIndex].foods=foods;
                     cache[ridIndex].foodsColor=foodsColor;
                 }
             }
             else if(cache[ridIndex].players.length <= 2){
+                cache[ridIndex].timeStamp=time();
                 cache[ridIndex].players.push(tempSnake);
-                if(partiallyIdentical(cache[ridIndex].foods,foods)){
+                if(partiallyIdentical(cache[ridIndex].foods,foods)&&foods.indexOf(-1)===-1){
                     cache[ridIndex].foods=foods;
                     cache[ridIndex].foodsColor=foodsColor;
                 }

@@ -135,8 +135,10 @@ function Controller(Config={
                             ojbk=false;
                         }
                         else if(pixels[val._data.head]>19&&pixels[val._data.head]<30){
+                            console.log(index);
                             val._data.score++;
-                            this._data.foods[pixels[val._data.head]-20].position=null;
+                            // this._data.foods[pixels[val._data.head]-20].position=null;
+                            this._data.foods[pixels[val._data.head]-20].position=(!Config.online||index===0)?null:-1;
                             this._data.snakes[index]._data.speed *= 0.97 ;
                             val.getLonger();
                             Materialize.toast(randomElement([
@@ -236,6 +238,7 @@ function Controller(Config={
         },
         checkData:function(data){
             if(data){
+                console.log(data.foods);
                 // this.platform.config.foodsColor=data.foodsColor;
                 this.platform._data.foods=this.platform._data.foods.map(function(val,index){
                     val.position=data.foods[index];

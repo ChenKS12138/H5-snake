@@ -32,7 +32,7 @@ app.all('*', function(req, res, next) {
 //ret 200房间正常有两个人  201 参数错误   202 房间只有一个人 203 房间已满
 
 app.use('/',function(req,res){
-    if(req.body!=={}&&req.body.rid!==null&&req.body.rid!==undefined){
+    if(req.body!=={}&&req.body.rid!==null&&req.body.rid!==undefined&&req.body.rid!==""){
         let tempSnake={
             score:req.body.score,
             body:req.body.body,
@@ -70,13 +70,19 @@ app.use('/',function(req,res){
                     cache[ridIndex].foodsColor=foodsColor;
                 }
             }
-            else if(cache[ridIndex].players.length <= 2){
+            else if(cache[ridIndex].players.length < 2){
                 cache[ridIndex].timeStamp=time();
                 cache[ridIndex].players.push(tempSnake);
                 if(partiallyIdentical(cache[ridIndex].foods,foods)&&foods.indexOf(-1)===-1){
                     cache[ridIndex].foods=foods;
                     cache[ridIndex].foodsColor=foodsColor;
                 }
+            }
+            else{
+                res.json({
+                    ret:203,
+                    data:null,
+                });
             }
             if(cache[ridIndex].players.length!==2){
                 res.json({

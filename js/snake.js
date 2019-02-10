@@ -80,6 +80,11 @@ function Controller(Config={
         },
         render:function(){
             setInterval(function(){
+                    if(Config.online){
+                        this._data.snakes.map(function(val,index){
+                            Config.snakes[index].scoreText.style.color=val._data.color;
+                        }.bind(this));
+                    }
                     let {pixels}=this._data;
                     let {
                         canvasBackGround,
@@ -173,7 +178,7 @@ function Controller(Config={
         //负责网络部分
         _data:{
             work:true,
-            status:204,//约定 200为服务器端有该房间且有对手的信息，201 参数错误   202 房间只有一个人 203 房间已满 204 为为输入rid
+            status:204,//约定 200为服务器端有该房间且有对手的信息，201 参数错误   202 房间只有一个人 203 房间已满 204 为为输入rid 205为已输入 ready状态
             sendData:{},
             rid:null//此处的rid需要用户自行生成，
         },
@@ -198,8 +203,8 @@ function Controller(Config={
                     foodsColor:foodsColor,
                 };
                 this.netController._data.sendData.rid=this.netController._data.rid;
-                if(this.netController._data.rid!==null){
-                    this.netController._data.status=202;
+                if(this.netController._data.rid!==null&&this.netController._data.status===204){
+                    this.netController._data.status=205;
                 }
             }.bind(this),1);
         }.bind(this),
@@ -208,16 +213,17 @@ function Controller(Config={
                 if(this._data.status!==204){
                     $.post(this.serverPath,this._data.sendData,function(data,status){
                         this._data.status=data.ret;
+                        // console.log(data.ret);
                         if(data.ret===201){
-                            Materialize.toast('参数非法',2000);
+                            // Materialize.toast('参数非法',2000);
                             this._data.status=201;
                         }
                         else if(data.ret===203){
-                            Materialize.toast('该房间已满',2000);
+                            // Materialize.toast('该房间已满',2000);
                             this._data.status=203;
                         }
                         else if(data.ret===202){
-                            Materialize.toast('房间只有一人，等待好友加入中',2000);
+                            // Materialize.toast('房间只有一人，等待好友加入中',2000);
                             this._data.status=202;
                         }
                         else if(data.ret===200){
@@ -256,6 +262,9 @@ function Controller(Config={
 
     (function initData(){
         Config.snakes.map(function(val,index){
+            if(Config.online){
+                val.scoreText.style.color=val.color;
+            }
             this.platform._data.wall.push(...innerPixel(cellNum));
             this.platform._data.snakes.push(new Snake([...this.platform._data.wall,...innerPixel(cellNum,1)],Config.snakes[index].color));
             if(!Config.online){

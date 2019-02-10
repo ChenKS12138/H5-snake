@@ -117,8 +117,9 @@ function Controller(Config={
         },
         update:function(){
             //根据isPause的真假值，判断是否更新，若更新 ， setTimeOut，则根据遍历snake的move()，修改pixels,再根据food的position是否为null，createFood()
+            
+            let ojbk=true;
             setInterval(function(){
-                let ojbk=true;
                 // if(!this._data.isPause){
                     let {snakes,foods,wall} = this._data;
                     pixels=new Array().fill(0);
@@ -136,11 +137,12 @@ function Controller(Config={
                                 pixels[value]=10+index;
                             }.bind(this));
                             pixels[val._data.head]=30;
-                            // Materialize.toast('HAHAH游戏结束,撞到墙了',2000);
+                            if(ojbk){
+                                Materialize.toast('HAHAH游戏结束,撞到墙了',2000);
+                            }
                             ojbk=false;
                         }
                         else if(pixels[val._data.head]>19&&pixels[val._data.head]<30){
-                            console.log(index);
                             val._data.score++;
                             // this._data.foods[pixels[val._data.head]-20].position=null;
                             this._data.foods[pixels[val._data.head]-20].position=(!Config.online||index===0)?null:-1;
@@ -159,10 +161,13 @@ function Controller(Config={
                         }
                     }.bind(this));
                     snakes.map(function(val,index){
-                        if(val._data.body.lastIndexOf(val._data.head)!==0){
+                        if(val._data.body.lastIndexOf(val._data.head)!==0&&val._data.body.lastIndexOf(val._data.head)!==-1&&index===0){
+                            console.log(val._data.body,val._data.head);
                             this._data.isPause=true;
                             val._data.active=false;
-                            // Materialize.toast('HAHAH游戏结束,撞到自己了',2000);
+                            if(ojbk){
+                                Materialize.toast('HAHAH游戏结束,撞到自己了',2000);
+                            }
                             ojbk=false;
                         }
                     }.bind(this));
@@ -232,19 +237,18 @@ function Controller(Config={
                         }
                         setTimeout(function(){
                             this.connect();
-                        }.bind(this),90);
+                        }.bind(this),70);
                     }.bind(this));
                 }
                 else{
                     setTimeout(function(){
                         this.connect();
-                    }.bind(this),90);
+                    }.bind(this),70);
                 }
             }
         },
         checkData:function(data){
             if(data){
-                console.log(data.foods);
                 // this.platform.config.foodsColor=data.foodsColor;
                 this.platform._data.foods=this.platform._data.foods.map(function(val,index){
                     val.position=data.foods[index];

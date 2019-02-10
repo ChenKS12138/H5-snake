@@ -130,7 +130,7 @@ let palette=new Vue({
                 id:3,
             },
             {
-                value:'yellow',
+                value:'#EEAD0E',
                 chosen:false,
                 text:'黄色',
                 id:4,

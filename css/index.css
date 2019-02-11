@@ -1,112 +1,112 @@
-*{
-    padding: 0;
-    margin: 0;
-    -webkit-tap-highlight-color: transparent;
+* {
+  padding: 0;
+  margin: 0;
+  -webkit-tap-highlight-color: transparent;
 }
-body,.core{
-    background-color: NavajoWhite;
-    text-align: center;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    user-select: none;
+body,
+.core {
+  background-color: NavajoWhite;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  user-select: none;
 }
-.core{
-    margin-top: 1rem;
-    display: none;
+.core {
+  margin-top: 1rem;
+  display: none;
 }
-#tip{
-    margin-top: 2rem;
+#tip {
+  margin-top: 2rem;
 }
-.title{
-    margin-left: -50px;
+.title {
+  margin-left: -50px;
 }
-.scores{
-    display: flex;
+.scores {
+  display: flex;
 }
-.score{
-    font-size: 2rem;
-    color: black;
-    margin-left: 0.5rem;
-    margin-right: 0.5rem;
+.score {
+  font-size: 2rem;
+  color: black;
+  margin-left: 0.5rem;
+  margin-right: 0.5rem;
 }
-#cav{
-    margin: 0rem 3rem 0rem 3rem;
-    margin-top: 0;
-    border: 0.8rem #696969 solid;
+#cav {
+  margin: 0rem 3rem 0rem 3rem;
+  margin-top: 0;
+  border: 0.8rem #696969 solid;
 }
-.main{
-    display: flex;
-    flex-direction: column;
+.main {
+  display: flex;
+  flex-direction: column;
 }
-.direction{
-    margin-top: 1rem;
-    transform: rotate(45deg);
-    
+.direction {
+  margin-top: 1rem;
+  transform: rotate(45deg);
 }
-.direction>div{
-    display: flex;
+.direction > div {
+  display: flex;
 }
-.direction>div>div{
-    width: 80px;
-    height: 80px;
-    background-color: #ff9800;
-    color: white;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border: 0.5px whitesmoke solid;
-    cursor: pointer;
+.direction > div > div {
+  width: 80px;
+  height: 80px;
+  background-color: #ff9800;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 0.5px whitesmoke solid;
+  cursor: pointer;
 }
-.direction>div>div:active{
-    background-color: #f57c00;
+.direction > div > div:active {
+  background-color: #f57c00;
 }
-.button-name{
-    transform: rotate(-45deg);
+.button-name {
+  transform: rotate(-45deg);
 }
-#up{
-    border-radius: 100% 0 0 0;
+#up {
+  border-radius: 100% 0 0 0;
 }
-#right{
-    border-radius: 0 100% 0 0;
+#right {
+  border-radius: 0 100% 0 0;
 }
-#down{
-    border-radius: 0 0 100% 0;
+#down {
+  border-radius: 0 0 100% 0;
 }
-#left{
-    border-radius: 0 0 0 100%;
+#left {
+  border-radius: 0 0 0 100%;
 }
-.controller{
-    margin-top: 5px;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-around;
-    align-items: center;
-    height: 120px;
+.controller {
+  margin-top: 5px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  align-items: center;
+  height: 120px;
 }
-.controller>div{
-    background-color: #ff9800;
-    color: white;
-    border-radius: 10px;
-    width: 200px;
-    height: 50px;
-    padding: 0;
-    margin: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border: white 0.5px solid;
-    cursor: pointer;
+.controller > div {
+  background-color: #ff9800;
+  color: white;
+  border-radius: 10px;
+  width: 200px;
+  height: 50px;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: white 0.5px solid;
+  cursor: pointer;
 }
-.controller>div:active{
-    background-color: #f57c00;
+.controller > div:active {
+  background-color: #f57c00;
 }
-.controller>div>p{
-    padding: 0;
-    margin: 0;
-    word-wrap: break-word;
-    word-break: break-all;
-    width: 80%;
+.controller > div > p {
+  padding: 0;
+  margin: 0;
+  word-wrap: break-word;
+  word-break: break-all;
+  width: 80%;
 }
 
 /* @media all and (max-width: 600px){
@@ -137,25 +137,25 @@ body,.core{
     }
 } */
 
-.shadow{
-    box-shadow: 2px 10px 6px rgba(0, 0, 0, 0.3);
+.shadow {
+  box-shadow: 2px 10px 6px rgba(0, 0, 0, 0.3);
 }
-.palette{
-    display: flex;
-    flex-direction: column;
-    margin-top: 1rem;
-    margin-bottom: 1rem;
+.palette {
+  display: flex;
+  flex-direction: column;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
 }
-.palette-notice{
-    font-size: 2.5rem;
+.palette-notice {
+  font-size: 2.5rem;
 }
-.palette>div{
-    display: flex;
-    justify-content: space-around;
+.palette > div {
+  display: flex;
+  justify-content: space-around;
 }
-.color-item{
-    width: 2.5rem;
-    height: 2.5rem;
-    border-radius: 50%;
-    cursor: pointer;
+.color-item {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+  cursor: pointer;
 }
